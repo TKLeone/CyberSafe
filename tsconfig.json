@@ -1,0 +1,9 @@
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",
+
+  "compileroptions": {
+    "outDir": "./dist",
+    "jsx": "react-natiev",
+    "strict": true
+  }
+}
