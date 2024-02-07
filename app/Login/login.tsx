@@ -1,26 +1,38 @@
+import axios from "axios";
 import React from "react";
-import {Pressable, SafeAreaView,StyleSheet,Text,TextInput} from "react-native";
+import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native";
 
-function handleAuth() {
-console.log("this works fine unlike dogshit input boxes that i could've done in regular html")
-}
 const UserForm = () => {
-  const[username, setUsername] = React.useState<string>('this suck');
-  const[password, setPassword] = React.useState<string>('Random');
-  const[email, setEmail]= React.useState<string>('Random');
+  const[username, setUsername] = React.useState<string>('');
+  const[password, setPassword] = React.useState<string>('');
+  const[email, setEmail]= React.useState<string>('');
+
+  const handleSubmit = async() => {
+    try {
+      let data = JSON.stringify ({
+        username: username,
+        password: password,
+        email: email,
+      })
+      const response = await axios.post("http://127.0.0.1:8001/users/", data, {headers: {"Content-Type": "application/json"}})
+      console.log(response.data)
+    } catch (err) {
+      console.log("Error", err)
+    }
+  }
 
   return(
   <SafeAreaView>
-      <div className="content-center">
-      <div>
+      <View>
+      <View>
       <TextInput
         onChangeText={setUsername}
         placeholder="Username"
         value={username}
         maxLength={15}
       />
-      </div>
-      <div>
+      </View>
+      <View>
       <TextInput
         onChangeText={setPassword}
         placeholder="Password"
@@ -28,20 +40,20 @@ const UserForm = () => {
         secureTextEntry={true}
         maxLength={15}
       />
-      </div>
-      <div>
+      </View>
+      <View>
       <TextInput
         onChangeText={setEmail}
         placeholder="email"
         value={email}
       />
-      </div>
-      </div>
-      <div style={styles.root}>
-        <Pressable style={styles.button}>
+      </View>
+      </View>
+      <View style={styles.root}>
+        <Pressable style={styles.button} onPress={handleSubmit}>
           <Text> Log-in </Text>
         </Pressable>
-      </div>
+      </View>
   </SafeAreaView>
   )
 }
