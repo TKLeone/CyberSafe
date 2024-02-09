@@ -2,6 +2,9 @@ import axios from "axios";
 import React from "react";
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native";
 
+
+// TODO: validate user forms
+// TODO: do full authentication across app
 const UserForm = () => {
   const[username, setUsername] = React.useState<string>('');
   const[password, setPassword] = React.useState<string>('');
@@ -57,6 +60,8 @@ const UserForm = () => {
   </SafeAreaView>
   )
 }
+
+// TODO: styling for log in page
 const styles = StyleSheet.create({
   root: {
     alignItems: "center",

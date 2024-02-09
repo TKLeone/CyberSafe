@@ -19,16 +19,17 @@ const userSchema = new Schema<I_users>({
     email: {type: String, required: true},
 })
 
-const User: Model<I_users> = mongoose.model("user", userSchema)
-
 userSchema.pre<I_users>("save", async function (next) {
+    console.log("DOES THIS WORK LOLZ")
     const user: I_users = this
     if (!user.isModified("password")) return next()
 
     const saltRounds: number = 10
     try {
+        console.log("original password: ", user.password)
         const hash = await bcrypt.hash(user.password, saltRounds)
         user.password = hash
+        console.log("hashed password: ", user.password)
         next()
     } catch (err) {
         if (err instanceof Error) {
@@ -37,6 +38,8 @@ userSchema.pre<I_users>("save", async function (next) {
         return next(new Error("An unkown error occured"))
     }
 })
+
+const User: Model<I_users> = mongoose.model("user", userSchema)
 
 app.use(cors())
 app.use(express.json())
@@ -49,7 +52,7 @@ app.get("/users", async (req: Request, res: Response) => {
         res.status(500).send(err)
     }
 })
-
+// TODO: more database validations
 app.post("/users", async (req: Request, res: Response) => {
     try {
         const { username, password, email } = req.body;
@@ -69,4 +72,3 @@ userSchema.methods.comparePassword = async function (newPassword: string) {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 })
-
