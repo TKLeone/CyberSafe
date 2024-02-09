@@ -37,7 +37,9 @@ userSchema.pre<I_users>("save", async function (next) {
         return next(new Error("An unkown error occured"))
     }
 })
+
 app.use(cors())
+app.use(express.json())
 
 app.get("/users", async (req: Request, res: Response) => {
     try {
@@ -48,10 +50,8 @@ app.get("/users", async (req: Request, res: Response) => {
     }
 })
 
-
 app.post("/users", async (req: Request, res: Response) => {
     try {
-        console.log("DOES THIS WORK??")
         const { username, password, email } = req.body;
         const newUser = new User({ username, password, email });
         await newUser.save();
