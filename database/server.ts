@@ -20,16 +20,13 @@ const userSchema = new Schema<I_users>({
 })
 
 userSchema.pre<I_users>("save", async function (next) {
-    console.log("DOES THIS WORK LOLZ")
     const user: I_users = this
     if (!user.isModified("password")) return next()
 
     const saltRounds: number = 10
     try {
-        console.log("original password: ", user.password)
         const hash = await bcrypt.hash(user.password, saltRounds)
         user.password = hash
-        console.log("hashed password: ", user.password)
         next()
     } catch (err) {
         if (err instanceof Error) {
