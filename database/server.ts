@@ -7,20 +7,20 @@ const port = 8001
 
 mongoose.connect("mongodb://127.0.0.1:27017/users")
 
-interface I_users extends Document {
+interface IUsers extends Document {
     username: string,
     password: string,
     email: string
 }
 
-const userSchema = new Schema<I_users>({
+const userSchema = new Schema<IUsers>({
     username: {type: String, required: true},
     password: {type: String, required: true},
     email: {type: String, required: true},
 })
 
-userSchema.pre<I_users>("save", async function (next) {
-    const user: I_users = this
+userSchema.pre<IUsers>("save", async function (next) {
+    const user: IUsers = this
     if (!user.isModified("password")) return next()
 
     const saltRounds: number = 10
@@ -36,11 +36,12 @@ userSchema.pre<I_users>("save", async function (next) {
     }
 })
 
-const User: Model<I_users> = mongoose.model("user", userSchema)
+const User: Model<IUsers> = mongoose.model("user", userSchema)
 
 app.use(cors())
 app.use(express.json())
 
+// probably remove this later so i don't expose the whole db lmfao
 app.get("/users", async (req: Request, res: Response) => {
     try {
         const users = await User.find()
@@ -49,6 +50,7 @@ app.get("/users", async (req: Request, res: Response) => {
         res.status(500).send(err)
     }
 })
+
 // TODO: more database validations
 app.post("/users", async (req: Request, res: Response) => {
     try {
