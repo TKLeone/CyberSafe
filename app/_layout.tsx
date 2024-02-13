@@ -7,7 +7,7 @@ const RootLayout = () => {
         headerShown: false,
       }}
     />
-     <Stack.Screen name = "Login/login"
+     <Stack.Screen name = "Authentication/Register"
       options = {{
         headerShown: false,
       }}

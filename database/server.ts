@@ -32,7 +32,7 @@ userSchema.pre<IUsers>("save", async function (next) {
         if (err instanceof Error) {
             return next(err as CallbackError)
         }
-        return next(new Error("An unkown error occured"))
+        return next(new Error("An unknown error occured"))
     }
 })
 
@@ -54,10 +54,17 @@ app.get("/users", async (req: Request, res: Response) => {
 // TODO: more database validations
 app.post("/users", async (req: Request, res: Response) => {
     try {
-        const { username, password, email } = req.body;
+        let { username, password, email } = req.body;
+        email = email.toLowerCase
+
+        const existingUser =  await User.findOne({email})
+
+        if (existingUser) {
+            return res.status(400).json({email: "Email already exists"})
+        }
+
         const newUser = new User({ username, password, email });
         await newUser.save();
-        res.status(201).json(newUser);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Internal Server Error" });
