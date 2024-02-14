@@ -1,9 +1,10 @@
 import axios, { AxiosError } from "axios"
+import {isEmail, isStrongPassword } from 'validator'
 import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native"
 
 // TODO: validate user forms
-// valid email format
+// validate email format
 // sanitise forms
 // TODO: do full authentication across app
 const UserForm = () => {
@@ -35,12 +36,12 @@ const UserForm = () => {
       console.log("Error", err)
     }
   }
-  
+
   const handleEmailChange = (value: string) => {
     setEmailError('')
     setEmail(value)
   }
-  
+
   const handleUsernameChange = (value: string) => {
     setUsernameError('')
     setUsername(value)
@@ -59,7 +60,7 @@ const UserForm = () => {
           onChangeText={handleUsernameChange}
           placeholder="Username"
           value={username}
-          maxLength={15}
+          maxLength={30}
         />
         <Text style={styles.errors}> {usernameError} </Text>
       </View>

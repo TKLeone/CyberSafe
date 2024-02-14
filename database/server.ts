@@ -51,19 +51,17 @@ app.get("/users", async (req: Request, res: Response) => {
     }
 })
 
-// TODO: more database validations
 app.post("/users", async (req: Request, res: Response) => {
     try {
         let { username, password, email } = req.body;
-        email = email.toLowerCase
+        email = email.toLowerCase()
 
         const existingUser =  await User.findOne({email})
-
         if (existingUser) {
             return res.status(400).json({email: "Email already exists"})
         }
 
-        const newUser = new User({ username, password, email });
+        const newUser = new User({ username, password, email: email});
         await newUser.save();
     } catch (err) {
         console.error(err);
@@ -71,6 +69,11 @@ app.post("/users", async (req: Request, res: Response) => {
     }
 });
 
+// TODO: validate and query data
+// TODO: send token back
+app.post("/login", async (req: Request, res: Response) => {
+
+})
 userSchema.methods.comparePassword = async function (newPassword: string) {
     return bcrypt.compare(newPassword, this.password)
 }
