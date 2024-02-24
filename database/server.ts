@@ -1,7 +1,10 @@
 import express, {Request, Response} from "express"
 import mongoose, {Document, Schema, Model, CallbackError} from "mongoose"
+import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import cors from "cors"
+import dotenv from "dotenv"
+dotenv.config()
 const app = express()
 const port = 8001
 
@@ -69,9 +72,43 @@ app.post("/users", async (req: Request, res: Response) => {
     }
 });
 
-// TODO: validate and query data
 // TODO: send token back
+// TODO: add the middleware for JWT verification
 app.post("/login", async (req: Request, res: Response) => {
+    let {email, password} = req.body
+    email = email.toLowerCase()
+
+    const user = await User.findOne({email:email})
+
+    if (!user) {
+        res.status(401).json({error: "Email can't be found"})
+    } else {
+        const passwordMatch = await bcrypt.compare(password, user.password)
+
+        if (!passwordMatch) {
+            return res.status(401).json({error: "Password can't be found"})
+        }
+        // TODO: fix env stuff
+        const secretKey: string = "test"
+        try {
+            if(secretKey){
+                console.log("does this code work")
+                const token = jwt.sign({user}, secretKey, { expiresIn: '1h' });
+
+                res.cookie("token", token, {
+                    httpOnly: true,
+                })
+
+            } else {
+                return res.status(500).json({error: "JWT signing error"})
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({error: "JWT signing error"})
+        }
+    }
+
+    return res.status(200).json({message: "Login successful"})
 
 })
 userSchema.methods.comparePassword = async function (newPassword: string) {

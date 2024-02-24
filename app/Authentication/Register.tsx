@@ -4,8 +4,8 @@ import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native"
 
 // TODO: validate user forms
-// validate email format
-// sanitise forms
+// TODO: validate email format
+// TODO: sanitise forms
 // TODO: do full authentication across app
 const UserForm = () => {
   const[username, setUsername] = React.useState<string>('')
