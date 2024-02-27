@@ -43,24 +43,20 @@ const UserForm = () => {
   }
 
   return (
-    <SafeAreaView>
-      <View>
-      <TextInput style={styles.root}
+    <SafeAreaView style={styles.root}>
+      <View style={styles.inputContainer}>
+      <TextInput style={styles.input}
         onChangeText={handleEmailChange}
         placeholder="Email"
         value={email}
       />
-      </View>
-      <View>
-        <TextInput style={styles.root}
+        <TextInput style={styles.input}
           onChangeText={handlePasswordChange}
           placeholder="Password"
           value={password}
           maxLength={40}
         />
         <Text style={styles.errors}> {passwordError} </Text>
-      </View>
-      <View style={styles.root}>
         <Pressable style={styles.button} onPress={handleLogin}>
           <Text> Login </Text>
         </Pressable>
@@ -71,16 +67,35 @@ const UserForm = () => {
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
     padding: 20
   },
+  inputContainer: {
+    width: "85%",
+    marginBottom: 20
+  },
+  input: {
+    backgroundColor: "#ffffff",
+    color: "black",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    height: 55
+  },
   button: {
-    color: "white",
-    backgroundColor: "red",
+    backgroundColor: "white",
     width: "100%",
-    borderColor:"white",
-    marginVertical: 5,
-
+    borderRadius: 10,
+    padding: 15,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18
   },
   errors: {
     alignItems: "center",

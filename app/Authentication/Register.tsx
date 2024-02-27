@@ -53,19 +53,18 @@ const UserForm = () => {
   }
 
   return(
-  <SafeAreaView>
-      <View>
-      <View>
+  <SafeAreaView style={styles.root}>
+      <View style={styles.inputContainer}>
         <TextInput
+          style={styles.input}
           onChangeText={handleUsernameChange}
           placeholder="Username"
           value={username}
           maxLength={30}
         />
         <Text style={styles.errors}> {usernameError} </Text>
-      </View>
-      <View>
         <TextInput
+          style={styles.input}
           onChangeText={handlePasswordChange}
           placeholder="Password"
           value={password}
@@ -73,18 +72,14 @@ const UserForm = () => {
           maxLength={15}
         />
         <Text style={styles.errors}> {passwordError} </Text>
-      </View>
-      <View>
         <TextInput
+          style={styles.input}
           onChangeText={handleEmailChange}
           placeholder="email"
           value={email}
           keyboardType="email-address"
         />
         <Text style={styles.errors}> {emailError} </Text>
-      </View>
-      </View>
-      <View style={styles.root}>
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text> Register </Text>
         </Pressable>
@@ -96,16 +91,35 @@ const UserForm = () => {
 // TODO: styling for log in page
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
     padding: 20
   },
+  inputContainer: {
+    width: "85%",
+    marginBottom: 20
+  },
+  input: {
+    backgroundColor: "#ffffff",
+    color: "black",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    height: 55
+  },
   button: {
-    color: "white",
-    backgroundColor: "red",
+    backgroundColor: "white",
     width: "100%",
-    borderColor:"white",
-    marginVertical: 5,
-
+    borderRadius: 10,
+    padding: 15,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18
   },
   errors: {
     alignItems: "center",
