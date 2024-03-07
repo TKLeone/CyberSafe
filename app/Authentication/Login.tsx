@@ -7,7 +7,8 @@ import {router} from "expo-router"
 const UserForm = () => {
   const[email, setEmail] = React.useState<string>('')
   const[password, setPassword] = React.useState<string>('')
-  const[EmailError, setEmailError] = React.useState<string>('')
+  // TODO: do input validation
+  const[emailError, setEmailError] = React.useState<string>('')
   const[passwordError, setPasswordError] = React.useState<string>('')
 
   const handleLogin = async () => {
@@ -15,14 +16,10 @@ const UserForm = () => {
       email: email,
       password: password,
     })
-    // TODO: send form data to server
     try {
-      const response = await axios.post("http://192.168.1.100:8001/login/", data, {headers: {"Content-Type": "application/json"}})
-      // TODO: do navigation for the successful login
-      // TODO: navigate to actual page
+      const response = await axios.post("http://localhost:8001/login/", data, {headers: {"Content-Type": "application/json"}, withCredentials: true})
       if (response.status === 200) {
-        console.log(response)
-        router.replace("UserPages/Home")
+        router.replace("UserPages/topics")
       }
     } catch (err) {
       const axiosError = err as AxiosError
@@ -41,7 +38,7 @@ const UserForm = () => {
     setPasswordError('')
     setPassword(value)
   }
-
+  // TODO: add a "x" button that takes you back to the home screen
   return (
     <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>

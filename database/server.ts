@@ -1,9 +1,12 @@
-import express, {Request, Response} from "express"
+import express, {NextFunction, Request, Response} from "express"
 import mongoose, {Document, Schema, Model, CallbackError} from "mongoose"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import cors from "cors"
 import dotenv from "dotenv"
+import cookieParser from "cookie-parser"
+import {cookieJWTAuth, IGetAuthenticatedRequest} from "./cookieJWTAuth"
+
 dotenv.config()
 const app = express()
 const port = 8001
@@ -41,10 +44,11 @@ userSchema.pre<IUsers>("save", async function (next) {
 
 const User: Model<IUsers> = mongoose.model("user", userSchema)
 
-app.use(cors())
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
 app.use(express.json())
+app.use(cookieParser())
 
-// probably remove this later so i don't expose the whole db lmfao
+// TODO: probably remove this later so i don't expose the whole db lmfao
 app.get("/users", async (req: Request, res: Response) => {
     try {
         const users = await User.find()
@@ -72,8 +76,6 @@ app.post("/users", async (req: Request, res: Response) => {
     }
 });
 
-// TODO: send token back
-// TODO: add the middleware for JWT verification
 app.post("/login", async (req: Request, res: Response) => {
     let {email, password} = req.body
     email = email.toLowerCase()
@@ -88,12 +90,11 @@ app.post("/login", async (req: Request, res: Response) => {
         if (!passwordMatch) {
             return res.status(401).json({error: "Password can't be found"})
         }
-        // TODO: fix env stuff
+        // FIXME: fix env stuff
         const secretKey: string = "test"
         try {
             if(secretKey){
-                console.log("does this code work")
-                const token = jwt.sign({user}, secretKey, { expiresIn: '1h' });
+                const token = jwt.sign({user}, secretKey, { expiresIn: '1m' });
 
                 res.cookie("token", token, {
                     httpOnly: true,
@@ -103,7 +104,6 @@ app.post("/login", async (req: Request, res: Response) => {
                 return res.status(500).json({error: "JWT signing error"})
             }
         } catch (error) {
-            console.log(error)
             return res.status(500).json({error: "JWT signing error"})
         }
     }
@@ -111,6 +111,9 @@ app.post("/login", async (req: Request, res: Response) => {
     return res.status(200).json({message: "Login successful"})
 
 })
+
+app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {});
+
 userSchema.methods.comparePassword = async function (newPassword: string) {
     return bcrypt.compare(newPassword, this.password)
 }
