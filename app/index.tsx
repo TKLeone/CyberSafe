@@ -1,8 +1,14 @@
-import {Text, SafeAreaView, StyleSheet, View, Pressable} from "react-native";
+import {Text, SafeAreaView, StyleSheet, Pressable} from "react-native";
 import {router} from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient'
+import validateJWT from "./Authentication/validateJWT"
+import {useEffect} from 'react'
 
 const HomePage = () => {
+  useEffect(() => {
+    console.log("index page validation triggers")
+    validateJWT(true)
+  }, [])
 
   const goToLogin = () =>{
     router.navigate("/Authentication/Login")
@@ -34,24 +40,24 @@ const HomePage = () => {
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "cream", // Change background color to cream
-    flex: 1, // Ensure the container takes the entire space
-    justifyContent: 'center', // Center content vertically
-    alignItems: 'center', // Center content horizontally
+    backgroundColor: "cream",
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   button: {
-    width: '70%', // Set the width to 70% of the container
+    width: '70%',
   },
   linearGradient: {
-    borderRadius: 10, // Adjust border radius for less rounded corners
-    paddingVertical: 15, // Add vertical padding for button height
-    paddingHorizontal: 30, // Add horizontal padding for button width
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
   },
   buttonText: {
-    color: 'white', // Set button text color to white
-    fontWeight: 'bold', // Apply bold font weight
-    fontSize: 18, // Set font size
-    textAlign: 'center', // Center text horizontally
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
   },
 })
 

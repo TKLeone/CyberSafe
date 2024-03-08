@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios"
 import React from "react"
-import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native"
+import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "react-native"
 import {router} from "expo-router"
 
 // TODO: finish form validation
@@ -17,7 +17,7 @@ const UserForm = () => {
       password: password,
     })
     try {
-      const response = await axios.post("http://localhost:8001/login/", data, {headers: {"Content-Type": "application/json"}, withCredentials: true})
+      const response = await axios.post("http://192.168.1.100:8001/login", data, {headers: {"Content-Type": "application/json"}, withCredentials: true})
       if (response.status === 200) {
         router.replace("UserPages/topics")
       }
@@ -41,6 +41,9 @@ const UserForm = () => {
   // TODO: add a "x" button that takes you back to the home screen
   return (
     <SafeAreaView style={styles.root}>
+      <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
+        <Image source={require("../../assets/exit.png")} style={styles.exitIcon}/>
+        </Pressable>
       <View style={styles.inputContainer}>
       <TextInput style={styles.input}
         onChangeText={handleEmailChange}
@@ -70,6 +73,7 @@ const styles = StyleSheet.create({
     padding: 20
   },
   inputContainer: {
+    position: "relative",
     width: "85%",
     marginBottom: 20
   },
@@ -97,6 +101,19 @@ const styles = StyleSheet.create({
   errors: {
     alignItems: "center",
     color: "red",
+    paddingBottom: 5,
+  },
+  quitButton: {
+    position: "absolute",
+    top: 80,
+    left: 25,
+    zIndex: 999,
+    padding: 5,
+    borderRadius: 5,
+  },
+  exitIcon: {
+    width: 17,
+    height: 17,
   }
 })
 

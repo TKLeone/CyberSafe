@@ -94,12 +94,13 @@ app.post("/login", async (req: Request, res: Response) => {
         const secretKey: string = "test"
         try {
             if(secretKey){
-                const token = jwt.sign({user}, secretKey, { expiresIn: '1m' });
-
+                const token = jwt.sign({user}, secretKey, { expiresIn: '1d' });
+                // TODO: see if expo-secure-storage works better
                 res.cookie("token", token, {
                     httpOnly: true,
                 })
 
+                return res.status(200).json({message: "Login successful"})
             } else {
                 return res.status(500).json({error: "JWT signing error"})
             }
@@ -107,9 +108,6 @@ app.post("/login", async (req: Request, res: Response) => {
             return res.status(500).json({error: "JWT signing error"})
         }
     }
-
-    return res.status(200).json({message: "Login successful"})
-
 })
 
 app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {});

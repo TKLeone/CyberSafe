@@ -7,6 +7,21 @@ const RootLayout = () => {
         headerShown: false,
       }}
     />
+    <Stack.Screen name = "UserPages/topics"
+      options = {{
+        headerShown: false,
+      }}
+    />
+    <Stack.Screen name = "Authentication/Register"
+      options = {{
+        headerShown: false,
+      }}
+    />
+    <Stack.Screen name = "Authentication/Login"
+      options = {{
+        headerShown: false,
+      }}
+    />
   </Stack>;
 };
 

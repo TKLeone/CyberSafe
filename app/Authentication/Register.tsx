@@ -1,7 +1,8 @@
 import axios, { AxiosError } from "axios"
 import {isEmail, isStrongPassword } from 'validator'
 import React from "react"
-import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native"
+import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "react-native"
+import { router } from "expo-router"
 
 // TODO: validate user forms
 // TODO: validate email format
@@ -27,7 +28,6 @@ const UserForm = () => {
         email: email,
       })
       const response = await axios.post("http://192.168.1.100:8001/users/", data, {headers: {"Content-Type": "application/json"}})
-      console.log(response.data)
     } catch (err) {
       const axiosError = err as AxiosError
       if (axiosError.response && axiosError.response.status === 400) {
@@ -54,6 +54,9 @@ const UserForm = () => {
 
   return(
   <SafeAreaView style={styles.root}>
+      <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
+        <Image source={require("../../assets/exit.png")} style={styles.exitIcon}/>
+        </Pressable>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -124,6 +127,18 @@ const styles = StyleSheet.create({
   errors: {
     alignItems: "center",
     color: "red",
+  },
+  quitButton: {
+    position: "absolute",
+    top: 80,
+    left: 25,
+    zIndex: 999,
+    padding: 5,
+    borderRadius: 5,
+  },
+  exitIcon: {
+    width: 17,
+    height: 17,
   }
 })
 
