@@ -54,10 +54,10 @@ const UserForm = () => {
 
   return(
   <SafeAreaView style={styles.root}>
-      <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
-        <Image source={require("../../assets/exit.png")} style={styles.exitIcon}/>
-        </Pressable>
       <View style={styles.inputContainer}>
+        <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
+          <Image source={require("../../assets/exit.png")} style={styles.exitIcon}/>
+        </Pressable>
         <TextInput
           style={styles.input}
           onChangeText={handleUsernameChange}
@@ -130,15 +130,13 @@ const styles = StyleSheet.create({
   },
   quitButton: {
     position: "absolute",
-    top: 80,
-    left: 25,
-    zIndex: 999,
-    padding: 5,
-    borderRadius: 5,
+    zIndex: 1,
+    top: -170,
+    left: 0,
   },
   exitIcon: {
-    width: 17,
-    height: 17,
+    width: 20,
+    height: 20,
   }
 })
 
