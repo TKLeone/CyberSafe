@@ -12,6 +12,11 @@ const RootLayout = () => {
         headerShown: false,
       }}
     />
+    <Stack.Screen name = "UserPages/info"
+      options = {{
+        headerShown: false,
+      }}
+    />
     <Stack.Screen name = "Authentication/Register"
       options = {{
         headerShown: false,

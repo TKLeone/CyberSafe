@@ -1,8 +1,8 @@
 import axios, { AxiosError } from "axios"
-import {isEmail, isStrongPassword } from 'validator'
 import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "react-native"
-import { router } from "expo-router"
+import { Dropdown} from "react-native-element-dropdown"
+import {router} from "expo-router"
 
 // TODO: validate user forms
 // TODO: validate email format
@@ -12,6 +12,11 @@ const UserForm = () => {
   const[username, setUsername] = React.useState<string>('')
   const[password, setPassword] = React.useState<string>('')
   const[email, setEmail]= React.useState<string>('')
+  const[ageRange, setAgeRange] = React.useState<string>('')
+  const[gender, setGender] = React.useState<string>('')
+
+  const[ageRangeError, setAgeRangeError] = React.useState<string>('')
+  const[genderError, setGenderError] = React.useState<string>('')
   const[usernameError, setUsernameError] = React.useState<string>('')
   const[passwordError, setPasswordError] = React.useState<string>('')
   const[emailError, setEmailError] = React.useState<string>('')
@@ -26,6 +31,8 @@ const UserForm = () => {
         username: username,
         password: password,
         email: email,
+        ageRange: ageRange,
+        gender: gender,
       })
       const response = await axios.post("http://192.168.1.100:8001/users/", data, {headers: {"Content-Type": "application/json"}})
     } catch (err) {
@@ -37,6 +44,20 @@ const UserForm = () => {
     }
   }
 
+  interface IAgeRange {
+    label: string,
+    value: string,
+  }
+  const ageRangeData: IAgeRange[] = [
+    {label: "13-14", value: "13-14"},
+    {label: "15-16", value: "15-16"},
+    {label: "17-19", value: "17-19"},
+  ]
+  const genderData = [
+    {label: "male", value: "male"},
+    {label: "female", value: "female"},
+    {label: "prefer not to say", value: "undisclosed"},
+  ]
   const handleEmailChange = (value: string) => {
     setEmailError('')
     setEmail(value)
@@ -83,6 +104,26 @@ const UserForm = () => {
           keyboardType="email-address"
         />
         <Text style={styles.errors}> {emailError} </Text>
+        <Dropdown
+          data = {ageRangeData}
+          labelField="label"
+          valueField="value"
+          value={ageRange}
+          placeholder="Age Range"
+          onChange={item => {
+            setAgeRange(item.value)
+          }}
+        />
+        <Dropdown
+          data = {genderData}
+          labelField="label"
+          valueField="value"
+          value={gender}
+          placeholder="Gender"
+          onChange={item => {
+            setGender(item.value)
+          }}
+        />
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text> Register </Text>
         </Pressable>

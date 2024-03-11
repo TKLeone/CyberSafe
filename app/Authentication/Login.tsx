@@ -38,7 +38,7 @@ const UserForm = () => {
     setPasswordError('')
     setPassword(value)
   }
-  // TODO: add a "x" button that takes you back to the home screen
+
   return (
     <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>
@@ -54,6 +54,7 @@ const UserForm = () => {
           onChangeText={handlePasswordChange}
           placeholder="Password"
           value={password}
+          secureTextEntry={true}
           maxLength={40}
         />
         <Text style={styles.errors}> {passwordError} </Text>

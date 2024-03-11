@@ -6,7 +6,6 @@ import {useEffect} from 'react'
 
 const HomePage = () => {
   useEffect(() => {
-    console.log("index page validation triggers")
     validateJWT(true)
   }, [])
 
