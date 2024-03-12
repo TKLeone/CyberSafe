@@ -1,6 +1,5 @@
 import React from "react"
 import {Text, SafeAreaView, View, ScrollView, StyleSheet} from "react-native"
-import {router} from "expo-router"
 
 const App = () => {
 

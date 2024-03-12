@@ -19,7 +19,7 @@ const UserForm = () => {
     try {
       const response = await axios.post("http://192.168.1.100:8001/login", data, {headers: {"Content-Type": "application/json"}, withCredentials: true})
       if (response.status === 200) {
-        router.replace("UserPages/topics")
+        router.replace("topics")
       }
     } catch (err) {
       const axiosError = err as AxiosError

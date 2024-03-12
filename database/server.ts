@@ -121,7 +121,6 @@ app.get("/ageRangeAndGender", cookieJWTAuth, async (req: IGetAuthenticatedReques
         if (req.user) {
             const user: JwtPayload = req.user as JwtPayload
             const data = await User.findById(user.user._id).select("ageRange gender -_id")
-            console.log(data)
             res.json(data)
         }
     } catch(err) {

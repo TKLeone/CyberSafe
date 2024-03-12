@@ -75,7 +75,7 @@ const App = () => {
   const sortedButtons = updatedButtons.slice().sort((a,b) => a.importance - b.importance)
 
   const handleClick = () => {
-    router.navigate("UserPages/info")
+    router.navigate("info")
   }
   // TODO: pass data so new page knows what content to show
   return (
