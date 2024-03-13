@@ -85,8 +85,7 @@ app.post("/login", async (req: Request, res: Response) => {
         if (!passwordMatch) {
             return res.status(401).json({error: "Password can't be found"})
         }
-        // FIXME: fix env stuff
-        const secretKey: string = "test"
+        const secretKey: string = process.env.SECRET_KEY as string;
         try {
             if(secretKey){
                 const token = jwt.sign({user}, secretKey, { expiresIn: '1d' })
@@ -130,11 +129,13 @@ app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, r
         newAgeRange = userAgeRange.get("ageRange")
     }
 
-    label = topicValidation(label, ageRange)
-    let result = await Topic.findOne({[label]: {$exists: true}})
-    if (result) {
-        result = result.get(label)
-        res.send(result)
+    label = topicValidation(label)
+    // NOTE: test caching or other methods to improve performance / db load
+    let topicData = await Topic.findOne({[label]: {$exists: true}})
+    if (topicData) {
+        const topic = topicData.get(label)
+        const extraInfo = topicData.get("extra_info")
+        res.send({topic,extraInfo})
     } else {
         res.status(500).json({error: "Internal Server Error"})
     }

@@ -11,66 +11,89 @@ const fetchData = async (label: string | string[], ageRange: string | string[]) 
   })
   try {
     const response = await axios.post("http://192.168.1.100:8001/getTopicData", sendData,{headers: {"Content-Type": "application/json", withCredentials: true}})
-    const topicText = response.data
-    return topicText
+    const data = response.data
+    return data
   } catch(err) {
     const axiosError = err as AxiosError
     if (axiosError.response  && axiosError.response.status === 500) {
-      console.log("this doesn't work")
+      // NOTE: add a popup or something
     }
   }
-}
-// NOTE: maybe do something with this
-const navigateBackToHome = () => {
-  router.navigate("/topics")
 }
 
 const App = () => {
   const [topicText, setTopicText] = useState<string>('')
+  const [extraInfo, setExtraInfo] = useState<string>('')
   const params = useLocalSearchParams()
   const label = params.label ? params.label : ""
   const ageRange = params.ageRange ? params.ageRange : ""
+
+  if (label === "" && ageRange === "") {
+    router.navigate("/topics")
+  }
 
   // TODO: TODAY add items to database based on gpt
   useEffect(() => {
     validateJWT(false)
     fetchData(label, ageRange).then((data)=>{
       if (data) {
-        setTopicText(data)
+        setTopicText(data.topic)
+        setExtraInfo(data.extraInfo)
       }
     })
     return () => {
       setTopicText("")
+      setExtraInfo("")
     }
   },[label, ageRange])
 
+  const segmentedTopicText = topicText.split("\n\n")
+
+  // TODO: TODAY add overlay that displays more information
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.textBox}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        <Text>
-            {topicText}
-        </Text>
-      </ScrollView>
+      <View style={styles.scrollView}>
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {segmentedTopicText.map((text, index) => (
+            <View key={index} style={styles.textBoxContainer}>
+              <Text style={styles.textBox}>
+                {text}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
- container: {
+  container: {
+    top: 70,
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
   },
   scrollView: {
+    flex: 1,
+    width: "100%",
+  },
+  scrollViewContent: {
     flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textBoxContainer: {
+    width: "95%", // Adjust as needed
+    marginBottom: 10,
+    borderRadius: 10,
+    overflow: "hidden",
   },
   textBox: {
-    height: "60%",
-    width: "95%",
-    top: -120,
-    paddingTop: 20,
+    padding: 15,
     backgroundColor: "#e0e0e0",
     justifyContent: "center",
     alignItems: "center",

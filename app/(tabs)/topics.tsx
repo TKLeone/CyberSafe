@@ -23,7 +23,6 @@ const fetchData = async () => {
     const axiosError = err as AxiosError
     if (axiosError.response && axiosError.response.status === 500) {
       // NOTE: add a popup or something
-      console.log("something went wrong")
     }
   }
 }
@@ -31,10 +30,9 @@ const fetchData = async () => {
 
 const buttons: buttonData[] = [
   {importance: 1, label: "Phishing"},
-  {importance: 2, label: "Cyber-bulling"},
-  {importance: 3, label: "Random"},
+  {importance: 2, label: "Cyber-bullying"},
   {importance: 4, label: "Online Predators"},
-  {importance: 5, label: "Peer Pressure and Social Media Risks"},
+  {importance: 5, label: "Peer Pressure"},
   {importance: 6, label: "Malware"},
   {importance: 7, label: "Privacy Settings"},
   {importance: 8, label: "Online Content"},
