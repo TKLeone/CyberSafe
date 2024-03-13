@@ -1,4 +1,4 @@
-import {router} from "expo-router"
+import {router, Link} from "expo-router"
 import React, { useEffect, useState } from "react"
 import {Text, SafeAreaView, Pressable, StyleSheet, View } from "react-native"
 import validateJWT from "../Authentication/validateJWT"
@@ -12,17 +12,17 @@ interface buttonData {
 
 interface userData {
   ageRange: string,
-  gender: string,
 }
 
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://192.168.1.100:8001/ageRangeAndGender", {withCredentials: true})
-    const {ageRange, gender} = response.data as userData
+    const response = await axios.get("http://192.168.1.100:8001/ageRange", {withCredentials: true})
+    const {ageRange} = response.data as userData
     return {ageRange}
   } catch (err) {
     const axiosError = err as AxiosError
     if (axiosError.response && axiosError.response.status === 500) {
+      // NOTE: add a popup or something
       console.log("something went wrong")
     }
   }
@@ -46,6 +46,7 @@ const updateButtonImportance =  (buttons: buttonData[], ageRangeData: string) =>
   const ageRange = ageRangeData
 
   const importanceMap: Record<string, number[]> = {
+    // NOTE: change topic importance to correct age ranges
     "13-14":[4,5,3,1,2,6,7,8,9,10],
     "15-16":[1,10,5,4,3,6,7,8,9,2],
     "17-19":[7,2,3,10,5,6,1,8,9,4],
@@ -68,22 +69,22 @@ const App = () => {
       setAgeRange(data.ageRange)
       }
     })
-    },[])
+  },[])
 
   const updatedButtons = ageRange ? updateButtonImportance(buttons, ageRange) : buttons
 
   const sortedButtons = updatedButtons.slice().sort((a,b) => a.importance - b.importance)
 
-  const handleClick = () => {
-    router.navigate("info")
+  const handleClick = (label: string, ageRange: string) => {
+    router.push({pathname: "/info", params: {label, ageRange}})
   }
-  // TODO: pass data so new page knows what content to show
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.buttonContainer}>
       {sortedButtons.map((button, index) => (
-        <Pressable key={index} onPress={() => handleClick()} style={styles.button}>
-          <Text>{button.label}</Text>
+        <Pressable key={index} onPress={() => handleClick(button.label, ageRange)} style={styles.button}>
+            <Text>{button.label}</Text>
         </Pressable>
       ))}
       </View>

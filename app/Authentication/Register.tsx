@@ -3,32 +3,38 @@ import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "react-native"
 import { Dropdown} from "react-native-element-dropdown"
 import {router} from "expo-router"
+import validator from "validator"
 
-// TODO: validate user forms
-// TODO: validate email format
-// TODO: sanitise forms
-// TODO: do full authentication across app
+// TODO: validate dropdown forms
 const UserForm = () => {
-  const[username, setUsername] = React.useState<string>('')
   const[password, setPassword] = React.useState<string>('')
   const[email, setEmail]= React.useState<string>('')
   const[ageRange, setAgeRange] = React.useState<string>('')
   const[gender, setGender] = React.useState<string>('')
-
-  const[ageRangeError, setAgeRangeError] = React.useState<string>('')
-  const[genderError, setGenderError] = React.useState<string>('')
-  const[usernameError, setUsernameError] = React.useState<string>('')
   const[passwordError, setPasswordError] = React.useState<string>('')
   const[emailError, setEmailError] = React.useState<string>('')
 
   const handleSubmit = async() => {
-    if (!username) setUsernameError("Username is required")
-    if (!password) setPasswordError("Password is required")
-    if (!email) setEmailError("E-mail is required")
+    let hasErrors: boolean = false;
 
+    if (!password) {
+      setPasswordError("Password is required") 
+      hasErrors = true
+    }
+    if (!email) {
+      setEmailError("E-mail is required")
+      hasErrors = true
+    }
+    if (!validateEmail(email)) {
+      setEmailError("E-mail is not in a valid format")
+      hasErrors = true
+    }
+
+    if (hasErrors) {
+      return;
+    }
     try {
       let data = JSON.stringify ({
-        username: username,
         password: password,
         email: email,
         ageRange: ageRange,
@@ -63,14 +69,13 @@ const UserForm = () => {
     setEmail(value)
   }
 
-  const handleUsernameChange = (value: string) => {
-    setUsernameError('')
-    setUsername(value)
-  }
-
   const handlePasswordChange = (value: string) => {
     setPasswordError('')
     setPassword(value)
+  }
+
+  const validateEmail = (email: string): boolean => {
+    return validator.isEmail(email)
   }
 
   return(
@@ -81,12 +86,13 @@ const UserForm = () => {
         </Pressable>
         <TextInput
           style={styles.input}
-          onChangeText={handleUsernameChange}
-          placeholder="Username"
-          value={username}
-          maxLength={30}
+          //  NOTE: find a better way to do this
+          onChangeText={handleEmailChange}
+          placeholder="email"
+          value={email}
+          keyboardType="email-address"
         />
-        <Text style={styles.errors}> {usernameError} </Text>
+        <Text style={styles.errors}> {emailError} </Text>
         <TextInput
           style={styles.input}
           onChangeText={handlePasswordChange}
@@ -96,14 +102,6 @@ const UserForm = () => {
           maxLength={15}
         />
         <Text style={styles.errors}> {passwordError} </Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={handleEmailChange}
-          placeholder="email"
-          value={email}
-          keyboardType="email-address"
-        />
-        <Text style={styles.errors}> {emailError} </Text>
         <Dropdown
           data = {ageRangeData}
           labelField="label"

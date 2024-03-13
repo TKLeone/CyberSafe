@@ -1,4 +1,4 @@
-import express, {NextFunction, Request, Response} from "express"
+import express, {Request, Response} from "express"
 import mongoose, {Document, Schema, Model, CallbackError} from "mongoose"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import bcrypt from "bcrypt"
@@ -6,15 +6,17 @@ import cors from "cors"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
 import {cookieJWTAuth, IGetAuthenticatedRequest} from "./cookieJWTAuth"
+import { ITopics, topicSchema} from "./topicDB"
+import { topicValidation} from "./topicValidation"
 
 dotenv.config()
 const app = express()
 const port = 8001
 
-mongoose.connect("mongodb://127.0.0.1:27017/users")
+// NOTE: see if devweb hosting works
+const userConn = mongoose.createConnection("mongodb://127.0.0.1:27017/users")
 
 interface IUsers extends Document {
-    username: string,
     password: string,
     email: string,
     ageRange: string,
@@ -22,7 +24,6 @@ interface IUsers extends Document {
 }
 
 const userSchema = new Schema<IUsers>({
-    username: {type: String, required: true},
     password: {type: String, required: true},
     email: {type: String, required: true},
     ageRange: {type: String, required: true},
@@ -46,25 +47,15 @@ userSchema.pre<IUsers>("save", async function (next) {
     }
 })
 
-const User: Model<IUsers> = mongoose.model("users", userSchema)
+const User: Model<IUsers> = userConn.model("users", userSchema)
 
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
 app.use(express.json())
 app.use(cookieParser())
 
-// TODO: probably remove this later so i don't expose the whole db lmfao
-app.get("/users", async (req: Request, res: Response) => {
-    try {
-        const users = await User.find()
-        res.json(users)
-    } catch(err) {
-        res.status(500).send(err)
-    }
-})
-
 app.post("/users", async (req: Request, res: Response) => {
     try {
-        let { username, password, email, ageRange, gender} = req.body
+        let {password, email, ageRange, gender} = req.body
         email = email.toLowerCase()
 
         const existingUser =  await User.findOne({email})
@@ -72,7 +63,7 @@ app.post("/users", async (req: Request, res: Response) => {
             return res.status(400).json({email: "Email already exists"})
         }
 
-        const newUser = new User({ username, password, email: email, ageRange, gender})
+        const newUser = new User({password, email: email, ageRange, gender})
         await newUser.save()
     } catch (err) {
         console.error(err)
@@ -116,15 +107,35 @@ app.post("/login", async (req: Request, res: Response) => {
 
 app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {})
 
-app.get("/ageRangeAndGender", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+app.get("/ageRange", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     try {
         if (req.user) {
             const user: JwtPayload = req.user as JwtPayload
-            const data = await User.findById(user.user._id).select("ageRange gender -_id")
+            const data = await User.findById(user.user._id).select("ageRange -_id")
             res.json(data)
         }
     } catch(err) {
         console.log(err)
+        res.status(500).json({error: "Internal Server Error"})
+    }
+})
+
+const Topic: Model<ITopics> = userConn.model("topics", topicSchema)
+
+app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+    let {label, ageRange} = req.body
+    const userAgeRange = await User.findOne({ageRange})
+    let newAgeRange = ""
+    if (userAgeRange) {
+        newAgeRange = userAgeRange.get("ageRange")
+    }
+
+    label = topicValidation(label, ageRange)
+    let result = await Topic.findOne({[label]: {$exists: true}})
+    if (result) {
+        result = result.get(label)
+        res.send(result)
+    } else {
         res.status(500).json({error: "Internal Server Error"})
     }
 })

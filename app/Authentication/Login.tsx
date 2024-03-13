@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios"
 import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "react-native"
 import {router} from "expo-router"
+import validator from "validator"
 
 // TODO: finish form validation
 const UserForm = () => {
@@ -12,10 +13,29 @@ const UserForm = () => {
   const[passwordError, setPasswordError] = React.useState<string>('')
 
   const handleLogin = async () => {
+    let hasErrors: boolean = false;
+    if (!password) {
+      setPasswordError("Password is required") 
+      hasErrors = true
+    }
+    if (!email) {
+      setEmailError("E-mail is required")
+      hasErrors = true
+    }
+    if (!validateEmail(email)) {
+      setEmailError("E-mail is not in a valid format")
+      hasErrors = true
+    }
+
+    if (hasErrors) {
+      return;
+    }
+
     let data = JSON.stringify({
       email: email,
       password: password,
     })
+
     try {
       const response = await axios.post("http://192.168.1.100:8001/login", data, {headers: {"Content-Type": "application/json"}, withCredentials: true})
       if (response.status === 200) {
@@ -39,6 +59,10 @@ const UserForm = () => {
     setPassword(value)
   }
 
+  const validateEmail = (email: string): boolean => {
+    return validator.isEmail(email)
+  }
+
   return (
     <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>
@@ -49,7 +73,9 @@ const UserForm = () => {
         onChangeText={handleEmailChange}
         placeholder="Email"
         value={email}
+        keyboardType="email-address"
       />
+        <Text style={styles.errors}> {emailError} </Text>
         <TextInput style={styles.input}
           onChangeText={handlePasswordChange}
           placeholder="Password"
