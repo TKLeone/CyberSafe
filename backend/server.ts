@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser"
 import {cookieJWTAuth, IGetAuthenticatedRequest} from "./cookieJWTAuth"
 import { ITopics, topicSchema} from "./topicDB"
 import { topicValidation} from "./topicValidation"
+import OpenAI from "openai"
 
 dotenv.config()
 const app = express()
@@ -104,6 +105,11 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 })
 
+
+userSchema.methods.comparePassword = async function (newPassword: string) {
+    return bcrypt.compare(newPassword, this.password)
+}
+
 app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {})
 
 app.get("/ageRange", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
@@ -141,9 +147,25 @@ app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, r
     }
 })
 
-userSchema.methods.comparePassword = async function (newPassword: string) {
-    return bcrypt.compare(newPassword, this.password)
-}
+const openai = new OpenAI()
+
+app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+    const test = req.body
+    try {
+        console.log("openai thing hits")
+        const completion = await openai.chat.completions.create({
+            messages:[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": test.question},
+            ],
+            model: "gpt-3.5-turbo",
+        })
+        const response = completion.choices[0].message.content
+        res.send(response)
+    } catch (err) {
+        res.status(400).json({error: "Can't connect to openAI api"})
+    }
+})
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)

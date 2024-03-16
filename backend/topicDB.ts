@@ -10,7 +10,6 @@ export interface ITopics extends Document {
     priv_settings: string,
     malware: string,
     online_predators: string,
-
 }
 
 export const topicSchema = new Schema<ITopics>({

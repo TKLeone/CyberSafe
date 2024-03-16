@@ -6,5 +6,6 @@
     "jsx": "react-native",
     "strict": true,
     "lib": ["esnext", "dom"]
-  }
+  },
+  "strictNullChecks": true
 }

@@ -30,7 +30,8 @@ const fetchData = async () => {
 
 const buttons: buttonData[] = [
   {importance: 1, label: "Phishing"},
-  {importance: 2, label: "Cyber-bullying"},
+  {importance: 2, label: "REPLACE VALUE"},
+  {importance: 3, label: "Cyber-bullying"},
   {importance: 4, label: "Online Predators"},
   {importance: 5, label: "Peer Pressure"},
   {importance: 6, label: "Malware"},
@@ -80,8 +81,8 @@ const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.buttonContainer}>
-      {sortedButtons.map((button, index) => (
-        <Pressable key={index} onPress={() => handleClick(button.label, ageRange)} style={styles.button}>
+      {sortedButtons.map((button) => (
+        <Pressable key={button.importance} onPress={() => handleClick(button.label, ageRange)} style={styles.button}>
             <Text>{button.label}</Text>
         </Pressable>
       ))}

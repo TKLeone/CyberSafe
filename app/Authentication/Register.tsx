@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios"
+import { Entypo } from '@expo/vector-icons'
 import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "react-native"
 import { Dropdown} from "react-native-element-dropdown"
@@ -82,7 +83,7 @@ const UserForm = () => {
   <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>
         <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
-          <Image source={require("../../assets/exit.png")} style={styles.exitIcon}/>
+            <Entypo name="circle-with-cross" size={35} color="black" />
         </Pressable>
         <TextInput
           style={styles.input}
