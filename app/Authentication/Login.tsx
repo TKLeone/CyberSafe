@@ -5,11 +5,9 @@ import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-nat
 import {router} from "expo-router"
 import validator from "validator"
 
-// TODO: finish form validation
 const UserForm = () => {
   const[email, setEmail] = React.useState<string>('')
   const[password, setPassword] = React.useState<string>('')
-  // TODO: do input validation
   const[emailError, setEmailError] = React.useState<string>('')
   const[passwordError, setPasswordError] = React.useState<string>('')
 
@@ -68,15 +66,15 @@ const UserForm = () => {
     <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>
         <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
-            <Entypo name="circle-with-cross" size={35} color="black" />
+          <Entypo name="circle-with-cross" size={35} color="black" />
         </Pressable>
-      <TextInput style={styles.input}
-        onChangeText={handleEmailChange}
-        placeholder="Email"
-        value={email}
-        keyboardType="email-address"
-      />
         <Text style={styles.errors}> {emailError} </Text>
+        <TextInput style={styles.input}
+          onChangeText={handleEmailChange}
+          placeholder="Email"
+          value={email}
+          keyboardType="email-address"
+        />
         <TextInput style={styles.input}
           onChangeText={handlePasswordChange}
           placeholder="Password"

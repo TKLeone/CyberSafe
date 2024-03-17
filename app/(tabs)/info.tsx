@@ -3,13 +3,14 @@ import {router, useLocalSearchParams} from "expo-router"
 import {Text, SafeAreaView, View, ScrollView, StyleSheet, Pressable} from "react-native"
 import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
-import { Entypo } from '@expo/vector-icons'
+import { Entypo, FontAwesome } from '@expo/vector-icons'
 
 const App = () => {
   const [extraInfo, setExtraInfo] = useState<string>('')
   const [showInfoBox, setShowInfoBox] = useState<boolean>(false)
   const [segmentedTopicText, setSegmentedTopictext] = useState<string[]>([""])
   const [segmentedInfoText, setSegmentedInfoText] = useState<string[]>([""])
+  const [showServerError, setShowServerError] = useState<boolean>(false)
 
   const fetchData = async (label: string | string[], ageRange: string | string[]) => {
     const sendData = JSON.stringify({
@@ -20,6 +21,7 @@ const App = () => {
       const response = await axios.post("http://192.168.1.100:8001/getTopicData", sendData,{headers: {"Content-Type": "application/json", withCredentials: true}})
 
       const segmentedTopicText: string[] = await response.data.topic.split("\n\n")
+      // NOTE: investigate async await and why this breaks some things if data isn't there
       const segmentedInfoText: string[]  = await response.data.extraInfo.split("\n\n")
 
       setSegmentedTopictext(segmentedTopicText)
@@ -28,7 +30,7 @@ const App = () => {
     } catch(err) {
       const axiosError = err as AxiosError
       if (axiosError.response  && axiosError.response.status === 500) {
-        // NOTE: add a popup or something
+        setShowServerError(true)
       }
     }
   }
@@ -93,12 +95,18 @@ const App = () => {
             showsVerticalScrollIndicator={false}
           >
             {extraInfo && (
-            <Text style={styles.infoText}> {extraInfo} </Text>
+              <Text style={styles.infoText}> {extraInfo} </Text>
             )}
           </ScrollView>
           <Pressable style={styles.closeButton} onPress={closeInfoBox}>
             <Entypo name="circle-with-cross" size={35} color="black" />
           </Pressable>
+        </View>
+      )}
+      {showServerError && (
+        <View style={styles.serverError}>
+          <FontAwesome style={styles.serverVector} name="server" size={24} color="black" />
+          <Text> An error has occured </Text>
         </View>
       )}
     </SafeAreaView>
@@ -111,6 +119,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
+  },
+  serverError: {
+    position: "absolute",
+    width: "60%",
+    height: 225,
+    backgroundColor: "red",
+    top: 200,
+    borderRadius: 10,
+  },
+  serverVector: {
+    position: "absolute",
+    alignSelf: "center",
+    top: 60,
   },
   scrollView: {
     flex: 1,

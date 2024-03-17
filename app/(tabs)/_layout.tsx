@@ -20,6 +20,13 @@ export default () => {
         }}
       />
       <Tabs.Screen
+        name="userResponse"
+        options={{
+          title: "Responses",
+          tabBarIcon: ({color}) => <FontAwesome name="sticky-note-o" size={24} color={color} />
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: "Settings",

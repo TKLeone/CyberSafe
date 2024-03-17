@@ -19,19 +19,19 @@ const App = () => {
       const sentData = {
         question: question,
       }
+      setQuestion("")
       const response = await axios.post("http://192.168.1.100:8001/api/openAI", sentData)
       setResponse(response.data)
     } catch (err) {
       const axiosError = err as AxiosError
-      if (axiosError.response && axiosError.response.data === 400) {
-        console.log(axiosError.response.data)
+      if (axiosError.response && axiosError.response.status === 400) {
+        // NOTE: add the server error pop up
       }
     }
   }
 
-  // TODO: add a running history for the responses
-  // NOTE: response state should stay the same for your history
-  // NOTE: clear text input after submission
+  // TODO: create new page that shows running history.
+  // TODO: save api response to database
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>

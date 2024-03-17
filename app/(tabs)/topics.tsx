@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import {Text, SafeAreaView, Pressable, StyleSheet, View } from "react-native"
 import validateJWT from "../Authentication/validateJWT"
 import axios, { AxiosError } from "axios"
-
+import { FontAwesome } from '@expo/vector-icons'
 
 interface buttonData {
   importance: number,
@@ -13,20 +13,6 @@ interface buttonData {
 interface userData {
   ageRange: string,
 }
-
-const fetchData = async () => {
-  try {
-    const response = await axios.get("http://192.168.1.100:8001/ageRange", {withCredentials: true})
-    const {ageRange} = response.data as userData
-    return {ageRange}
-  } catch (err) {
-    const axiosError = err as AxiosError
-    if (axiosError.response && axiosError.response.status === 500) {
-      // NOTE: add a popup or something
-    }
-  }
-}
-
 
 const buttons: buttonData[] = [
   {importance: 1, label: "Phishing"},
@@ -45,7 +31,7 @@ const updateButtonImportance =  (buttons: buttonData[], ageRangeData: string) =>
   const ageRange = ageRangeData
 
   const importanceMap: Record<string, number[]> = {
-    // NOTE: change topic importance to correct age ranges
+    // TODO: change topic importance to correct age ranges
     "13-14":[4,5,3,1,2,6,7,8,9,10],
     "15-16":[1,10,5,4,3,6,7,8,9,2],
     "17-19":[7,2,3,10,5,6,1,8,9,4],
@@ -61,6 +47,21 @@ const updateButtonImportance =  (buttons: buttonData[], ageRangeData: string) =>
 
 const App = () => {
   const [ageRange, setAgeRange] = useState<string>("")
+  const [showServerError, setShowServerError] = useState<boolean>(false)
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://192.168.1.100:8001/ageRange", {withCredentials: true})
+      const {ageRange} = response.data as userData
+      return {ageRange}
+    } catch (err) {
+      const axiosError = err as AxiosError
+      if (axiosError.response && axiosError.response.status === 500) {
+        setShowServerError(true)
+      }
+    }
+  }
+
   useEffect(() => {
     validateJWT(false)
     fetchData().then((data) => {
@@ -80,6 +81,12 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {showServerError && (
+        <View style={styles.serverError}>
+          <FontAwesome name="server" size={24} color="black" />
+          <Text> An error has occured </Text>
+        </View>
+      )}
       <View style={styles.buttonContainer}>
       {sortedButtons.map((button) => (
         <Pressable key={button.importance} onPress={() => handleClick(button.label, ageRange)} style={styles.button}>
@@ -91,13 +98,15 @@ const App = () => {
   )
 }
 
-
 // TODO: change to one button per row
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-start",
     paddingTop: 20,
+  },
+  serverError: {
+    alignSelf: "center"
   },
   buttonContainer: {
     flexDirection: "row",

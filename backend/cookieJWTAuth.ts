@@ -17,7 +17,7 @@ export const cookieJWTAuth = (req: IGetAuthenticatedRequest, res: Response, next
             req.user = user
             next()
         }
-    } catch (error) {
+    } catch (err) {
         res.clearCookie("token")
         res.status(401).json({error: "Cookie either outdated or not verifiable"})
     }

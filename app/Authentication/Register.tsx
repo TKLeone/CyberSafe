@@ -6,14 +6,13 @@ import { Dropdown} from "react-native-element-dropdown"
 import {router} from "expo-router"
 import validator from "validator"
 
-// TODO: validate dropdown forms
 const UserForm = () => {
   const[password, setPassword] = React.useState<string>('')
   const[email, setEmail]= React.useState<string>('')
   const[ageRange, setAgeRange] = React.useState<string>('')
-  const[gender, setGender] = React.useState<string>('')
   const[passwordError, setPasswordError] = React.useState<string>('')
   const[emailError, setEmailError] = React.useState<string>('')
+  const[ageRangeError, setAgeRangeError] = React.useState<string>('')
 
   const handleSubmit = async() => {
     let hasErrors: boolean = false;
@@ -26,6 +25,10 @@ const UserForm = () => {
       setEmailError("E-mail is required")
       hasErrors = true
     }
+    if (!ageRange) {
+      setAgeRangeError("Fill out your age range")
+      hasErrors = true
+    }
     if (!validateEmail(email)) {
       setEmailError("E-mail is not in a valid format")
       hasErrors = true
@@ -34,13 +37,14 @@ const UserForm = () => {
     if (hasErrors) {
       return;
     }
+
     try {
       let data = JSON.stringify ({
         password: password,
         email: email,
         ageRange: ageRange,
-        gender: gender,
       })
+
       const response = await axios.post("http://192.168.1.100:8001/users/", data, {headers: {"Content-Type": "application/json"}})
     } catch (err) {
       const axiosError = err as AxiosError
@@ -85,15 +89,15 @@ const UserForm = () => {
         <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
             <Entypo name="circle-with-cross" size={35} color="black" />
         </Pressable>
+        <Text style={styles.errors}> {emailError} </Text>
         <TextInput
           style={styles.input}
-          //  NOTE: find a better way to do this
           onChangeText={handleEmailChange}
           placeholder="email"
           value={email}
           keyboardType="email-address"
         />
-        <Text style={styles.errors}> {emailError} </Text>
+        <Text style={styles.errors}> {passwordError} </Text>
         <TextInput
           style={styles.input}
           onChangeText={handlePasswordChange}
@@ -102,7 +106,7 @@ const UserForm = () => {
           secureTextEntry={true}
           maxLength={15}
         />
-        <Text style={styles.errors}> {passwordError} </Text>
+        <Text style={styles.errors}> {ageRangeError} </Text>
         <Dropdown
           data = {ageRangeData}
           labelField="label"
@@ -111,16 +115,6 @@ const UserForm = () => {
           placeholder="Age Range"
           onChange={item => {
             setAgeRange(item.value)
-          }}
-        />
-        <Dropdown
-          data = {genderData}
-          labelField="label"
-          valueField="value"
-          value={gender}
-          placeholder="Gender"
-          onChange={item => {
-            setGender(item.value)
           }}
         />
         <Pressable style={styles.button} onPress={handleSubmit}>

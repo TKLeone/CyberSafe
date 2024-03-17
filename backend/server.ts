@@ -21,14 +21,12 @@ interface IUsers extends Document {
     password: string,
     email: string,
     ageRange: string,
-    gender: string,
 }
 
 const userSchema = new Schema<IUsers>({
     password: {type: String, required: true},
     email: {type: String, required: true},
     ageRange: {type: String, required: true},
-    gender: {type: String, required: true}
 })
 
 userSchema.pre<IUsers>("save", async function (next) {
@@ -56,7 +54,7 @@ app.use(cookieParser())
 
 app.post("/users", async (req: Request, res: Response) => {
     try {
-        let {password, email, ageRange, gender} = req.body
+        let {password, email, ageRange} = req.body
         email = email.toLowerCase()
 
         const existingUser =  await User.findOne({email})
@@ -64,7 +62,7 @@ app.post("/users", async (req: Request, res: Response) => {
             return res.status(400).json({email: "Email already exists"})
         }
 
-        const newUser = new User({password, email: email, ageRange, gender})
+        const newUser = new User({password, email: email, ageRange})
         await newUser.save()
     } catch (err) {
         console.error(err)
@@ -99,7 +97,7 @@ app.post("/login", async (req: Request, res: Response) => {
             } else {
                 return res.status(500).json({error: "JWT signing error"})
             }
-        } catch (error) {
+        } catch (err) {
             return res.status(500).json({error: "JWT signing error"})
         }
     }
@@ -111,6 +109,41 @@ userSchema.methods.comparePassword = async function (newPassword: string) {
 }
 
 app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {})
+
+app.get("/Logout", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+    const token = req.cookies.token
+    try {
+        if (token) {
+            res.clearCookie("token").status(200).json({message: "Account has been logged out?"})
+        } else {
+            // reset content status code (205)
+            res.status(205).json({message: "Account has already been logged out"})
+        }
+    } catch (err) {
+        res.status(500).json({error: "Internal Server Error"})
+    }
+})
+
+app.get("/deleteaccount", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+    try {
+        if (req.user) {
+            const user: JwtPayload = req.user as JwtPayload
+            const doc = await User.findById(user.user._id)
+            if (doc) {
+                const checkDeletion = await doc?.deleteOne()
+                if (checkDeletion.deletedCount > 0) {
+                    res.status(200).json({message: "Account deleted"})
+                } else {
+                    res.status(500).json({error: "Account was not deleted"})
+                }
+            } else {
+                res.status(500).json({error: "Account not found"})
+            }
+        }
+    } catch (err) {
+        res.status(500).json({erro: "Internal Server Error"})
+    }
+})
 
 app.get("/ageRange", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     try {
@@ -151,11 +184,11 @@ const openai = new OpenAI()
 
 app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     const test = req.body
+    const message: string = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 13-14 for the response you give. "
     try {
-        console.log("openai thing hits")
         const completion = await openai.chat.completions.create({
             messages:[
-                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "system", "content": message},
                 {"role": "user", "content": test.question},
             ],
             model: "gpt-3.5-turbo",
