@@ -4,7 +4,7 @@ import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native"
 import {router} from "expo-router"
 import validator from "validator"
-
+import * as Securestore from "expo-secure-store"
 const UserForm = () => {
   const[email, setEmail] = React.useState<string>('')
   const[password, setPassword] = React.useState<string>('')
@@ -38,6 +38,8 @@ const UserForm = () => {
     try {
       const response = await axios.post("http://192.168.1.100:8001/login", data, {headers: {"Content-Type": "application/json"}, withCredentials: true})
       if (response.status === 200) {
+        const token = response.data
+        await Securestore.setItemAsync("jwt", token)
         router.replace("topics")
       }
     } catch (err) {

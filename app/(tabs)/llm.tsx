@@ -3,6 +3,7 @@ import {Text, SafeAreaView, View, ScrollView, StyleSheet, Pressable, TextInput} 
 import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
 import { FontAwesome } from '@expo/vector-icons'
+import * as SecureStore from "expo-secure-store"
 
 
 const App = () => {
@@ -15,9 +16,11 @@ const App = () => {
 
   // NOTE: potentially add limits for api calls
   const sendQuestion = async () => {
+    const token = await SecureStore.getItemAsync("jwt")
     try {
       const sentData = {
         question: question,
+        token
       }
       setQuestion("")
       const response = await axios.post("http://192.168.1.100:8001/api/openAI", sentData)
@@ -35,7 +38,7 @@ const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>
-        <TextInput 
+        <TextInput
           style={styles.askBox}
           onChangeText={setQuestion}
           placeholder="Ask a question... "
@@ -47,7 +50,11 @@ const App = () => {
           <FontAwesome name="arrow-circle-right" size={30} color="black" />
         </Pressable>
       </View>
-      <ScrollView style={styles.responseScrollView} contentContainerStyle={styles.responseContainer}>
+      <ScrollView 
+        style={styles.responseScrollView} 
+        contentContainerStyle={styles.responseContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View>
           <Text> {response} </Text>
         </View>

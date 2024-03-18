@@ -5,7 +5,9 @@
     "outDir": "./dist",
     "jsx": "react-native",
     "strict": true,
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext", "dom"],
+    "target": "esnext",
+    "module": "esnext"
   },
   "strictNullChecks": true
 }

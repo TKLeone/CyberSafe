@@ -64,6 +64,7 @@ app.post("/users", async (req: Request, res: Response) => {
 
         const newUser = new User({password, email: email, ageRange})
         await newUser.save()
+        res.status(200).json({message: "Registered Account"})
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: "Internal Server Error" })
@@ -87,13 +88,9 @@ app.post("/login", async (req: Request, res: Response) => {
         const secretKey: string = process.env.SECRET_KEY as string;
         try {
             if(secretKey){
-                const token = jwt.sign({user}, secretKey, { expiresIn: '1d' })
-                // TODO: see if expo-secure-storage works better
-                res.cookie("token", token, {
-                    httpOnly: true,
-                })
+                const token = jwt.sign({user}, secretKey, { expiresIn: '1m' })
 
-                return res.status(200).json({message: "Login successful"})
+                return res.send(token).status(200)
             } else {
                 return res.status(500).json({error: "JWT signing error"})
             }
@@ -103,15 +100,16 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 })
 
-
 userSchema.methods.comparePassword = async function (newPassword: string) {
     return bcrypt.compare(newPassword, this.password)
 }
 
-app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {})
+app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {
+    res.status(200).json({message: "Successful Validation"})
+})
 
 app.get("/Logout", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
-    const token = req.cookies.token
+    const token = req.body.token
     try {
         if (token) {
             res.clearCookie("token").status(200).json({message: "Account has been logged out?"})
@@ -124,7 +122,7 @@ app.get("/Logout", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Res
     }
 })
 
-app.get("/deleteaccount", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+app.post("/deleteaccount", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     try {
         if (req.user) {
             const user: JwtPayload = req.user as JwtPayload
@@ -145,7 +143,7 @@ app.get("/deleteaccount", cookieJWTAuth, async (req: IGetAuthenticatedRequest, r
     }
 })
 
-app.get("/ageRange", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+app.post("/ageRange", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     try {
         if (req.user) {
             const user: JwtPayload = req.user as JwtPayload
@@ -169,7 +167,6 @@ app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, r
     }
 
     label = topicValidation(label)
-    // NOTE: test caching or other methods to improve performance / db load
     let topicData = await Topic.findOne({[label]: {$exists: true}})
     if (topicData) {
         const topic = topicData.get(label)
@@ -184,6 +181,7 @@ const openai = new OpenAI()
 
 app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     const test = req.body
+    // TODO: add custom messages based on age range
     const message: string = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 13-14 for the response you give. "
     try {
         const completion = await openai.chat.completions.create({

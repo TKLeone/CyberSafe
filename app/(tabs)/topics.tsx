@@ -4,6 +4,7 @@ import {Text, SafeAreaView, Pressable, StyleSheet, View } from "react-native"
 import validateJWT from "../Authentication/validateJWT"
 import axios, { AxiosError } from "axios"
 import { FontAwesome } from '@expo/vector-icons'
+import * as SecureStore from "expo-secure-store"
 
 interface buttonData {
   importance: number,
@@ -50,8 +51,9 @@ const App = () => {
   const [showServerError, setShowServerError] = useState<boolean>(false)
 
   const fetchData = async () => {
+    const token = await SecureStore.getItemAsync("jwt")
     try {
-      const response = await axios.get("http://192.168.1.100:8001/ageRange", {withCredentials: true})
+      const response = await axios.post("http://192.168.1.100:8001/ageRange", {token},{withCredentials: true})
       const {ageRange} = response.data as userData
       return {ageRange}
     } catch (err) {

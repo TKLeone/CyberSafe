@@ -3,19 +3,16 @@ import axios, { AxiosError } from "axios"
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native"
 import { router } from "expo-router"
 
-// TODO: add delete account
+import * as SecureStore from "expo-secure-store"
+
 // TODO: potentially add colour themes
 // TODO: add account information
 const App = () => {
 
   const logOut = async () => {
     try {
-      const response = await axios.get("http://192.168.1.100:8001/Logout", {withCredentials: true})
-      if (response.status === 200) {
+        await SecureStore.deleteItemAsync("jwt")
         router.replace("/")
-      } else if (response.status === 205) {
-        router.replace("/")
-      }
     } catch (err) {
       const axiosError = err as AxiosError
       if(axiosError.response && axiosError.response.status === 500){
@@ -25,9 +22,11 @@ const App = () => {
   }
 
   const deleteAccount = async () => {
+    const token = await SecureStore.getItemAsync("jwt")
     try {
-      const response = await axios.get("http://192.168.1.100:8001/deleteaccount", {withCredentials: true})
+      const response = await axios.post("http://192.168.1.100:8001/deleteaccount", {token},{withCredentials: true})
       if (response.status === 200) {
+        await SecureStore.deleteItemAsync("jwt")
         router.replace("/")
       }
     } catch (err) {

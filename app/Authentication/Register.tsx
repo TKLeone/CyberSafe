@@ -5,6 +5,7 @@ import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "re
 import { Dropdown} from "react-native-element-dropdown"
 import {router} from "expo-router"
 import validator from "validator"
+import * as SecureStore from "expo-secure-store"
 
 const UserForm = () => {
   const[password, setPassword] = React.useState<string>('')
@@ -45,13 +46,15 @@ const UserForm = () => {
         ageRange: ageRange,
       })
 
-      const response = await axios.post("http://192.168.1.100:8001/users/", data, {headers: {"Content-Type": "application/json"}})
+      const response = await axios.post("http://192.168.1.100:8001/users", data, {headers: {"Content-Type": "application/json"}})
+      if (response.status === 200) {
+        router.navigate("Authentication/Login")
+      }
     } catch (err) {
       const axiosError = err as AxiosError
       if (axiosError.response && axiosError.response.status === 400) {
         setEmailError("Email already exists. Please choose another one or log in.")
       }
-      console.log("Error", err)
     }
   }
 

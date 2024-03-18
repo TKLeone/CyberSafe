@@ -4,6 +4,7 @@ import {Text, SafeAreaView, View, ScrollView, StyleSheet, Pressable} from "react
 import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
 import { Entypo, FontAwesome } from '@expo/vector-icons'
+import * as SecureStore from "expo-secure-store"
 
 const App = () => {
   const [extraInfo, setExtraInfo] = useState<string>('')
@@ -13,9 +14,11 @@ const App = () => {
   const [showServerError, setShowServerError] = useState<boolean>(false)
 
   const fetchData = async (label: string | string[], ageRange: string | string[]) => {
+    const token = await SecureStore.getItemAsync("jwt")
     const sendData = JSON.stringify({
       label: label,
       ageRange: ageRange,
+      token
     })
     try {
       const response = await axios.post("http://192.168.1.100:8001/getTopicData", sendData,{headers: {"Content-Type": "application/json", withCredentials: true}})
@@ -49,6 +52,7 @@ const App = () => {
       setExtraInfo("")
       setSegmentedInfoText([])
       setSegmentedTopictext([])
+      closeInfoBox()
     }
   },[label, ageRange])
 
