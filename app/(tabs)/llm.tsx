@@ -14,7 +14,6 @@ const App = () => {
     validateJWT(false)
   })
 
-  // NOTE: potentially add limits for api calls
   const sendQuestion = async () => {
     const token = await SecureStore.getItemAsync("jwt")
     try {
@@ -33,8 +32,6 @@ const App = () => {
     }
   }
 
-  // TODO: create new page that shows running history.
-  // TODO: save api response to database
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>
@@ -68,6 +65,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#212121",
   },
   inputContainer: {
     flex: 1,
@@ -84,7 +82,7 @@ const styles = StyleSheet.create({
     top: 40,
     width: "90%",
     height: 50,
-    backgroundColor: "lightgrey",
+    backgroundColor: "#A9A9A9",
     borderWidth: 1,
     borderColor: "black",
     borderRadius: 10,

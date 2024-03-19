@@ -69,9 +69,7 @@ const App = () => {
   function closeInfoBox() {
     setShowInfoBox(false)
   }
-  console.log(segmentedTopicText[0])
 
-  // TODO: TODAY add items to database based on gpt
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scrollView}>
@@ -94,7 +92,7 @@ const App = () => {
       </View>
       {showInfoBox && (
         <View style={styles.infoBoxContainer}>
-          <ScrollView 
+          <ScrollView
             style={styles.infoBox}
             showsVerticalScrollIndicator={false}
           >
@@ -121,6 +119,7 @@ const styles = StyleSheet.create({
   container: {
     top: 70,
     flex: 1,
+    backgroundColor: "#212121",
     justifyContent: "center",
     alignItems: "center"
   },
@@ -149,32 +148,35 @@ const styles = StyleSheet.create({
   textBoxContainer: {
     width: "95%",
     marginBottom: 10,
+    marginTop: 10,
     borderRadius: 10,
     overflow: "hidden",
   },
   textBox: {
     padding: 15,
-    backgroundColor: "#e0e0e0",
+    color: "white",
+    backgroundColor: "#D22B2B",
+    opacity: 0.8,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
   },
   infoBoxContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   infoBox: {
-    position: 'absolute',
-    top: '33%',
+    position: "absolute",
+    top: "33%",
     left: "2.5%",
     right: "2.5%",
     bottom: 0,
-    backgroundColor: '#fff',
+    backgroundColor: "#A9A9A9",
     padding: 20,
     paddingTop: 60,
     borderRadius: 10,
@@ -182,11 +184,12 @@ const styles = StyleSheet.create({
   infoText: {
     borderWidth: 1,
     borderColor: "black",
+    backgroundColor: "#A9A9A9",
     borderRadius: 10,
     padding: 5,
   },
   closeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 250,
     left: 10,
     padding: 10,

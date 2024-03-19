@@ -90,7 +90,7 @@ const UserForm = () => {
   <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>
         <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
-            <Entypo name="circle-with-cross" size={35} color="black" />
+            <Entypo name="circle-with-cross" size={35} color="#FF954F" />
         </Pressable>
         <Text style={styles.errors}> {emailError} </Text>
         <TextInput
@@ -132,16 +132,17 @@ const UserForm = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: "#212121",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20
+    padding: 20,
   },
   inputContainer: {
     width: "85%",
     marginBottom: 20
   },
   input: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#A9A9A9",
     color: "black",
     borderRadius: 10,
     padding: 15,
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     height: 55
   },
   button: {
-    backgroundColor: "white",
+    backgroundColor: "#FF954F",
     width: "100%",
     borderRadius: 10,
     padding: 15,

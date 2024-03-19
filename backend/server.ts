@@ -9,6 +9,7 @@ import {cookieJWTAuth, IGetAuthenticatedRequest} from "./cookieJWTAuth"
 import { ITopics, topicSchema} from "./topicDB"
 import { topicValidation} from "./topicValidation"
 import OpenAI from "openai"
+import { PlatformColor } from "react-native"
 
 dotenv.config()
 const app = express()
@@ -88,7 +89,7 @@ app.post("/login", async (req: Request, res: Response) => {
         const secretKey: string = process.env.SECRET_KEY as string;
         try {
             if(secretKey){
-                const token = jwt.sign({user}, secretKey, { expiresIn: '1m' })
+                const token = jwt.sign({user}, secretKey, { expiresIn: '20m' })
 
                 return res.send(token).status(200)
             } else {
@@ -108,6 +109,24 @@ app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Res
     res.status(200).json({message: "Successful Validation"})
 })
 
+app.post("/getAccountInfo", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+    try {
+        if (req.user) {
+            const user: JwtPayload = req.user as JwtPayload
+            const data = await User.findById(user.user._id).select("email ageRange gender -_id")
+            if (data) {
+                res.json(data)
+            } else {
+                res.status(401).json({error: "Can't get user from database"})
+            } 
+        } else {
+            res.status(401).json({error: "User can't be foundd"})
+        }
+
+    } catch (err) {
+        res.status(500).json({error: "Internal Server Error"})
+    }
+})
 app.get("/Logout", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     const token = req.body.token
     try {
@@ -179,10 +198,40 @@ app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, r
 
 const openai = new OpenAI()
 
+interface IResponse extends Document{
+    userId: Schema.Types.ObjectId
+    info: string
+}
+
+const responseSchema = new Schema<IResponse>({
+    userId: {type: Schema.Types.ObjectId},
+    info: {type: String, required: true}
+})
+
+
+const userResponse: Model<IResponse> = userConn.model("responses", responseSchema)
+
+
 app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     const test = req.body
-    // TODO: add custom messages based on age range
-    const message: string = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 13-14 for the response you give. "
+    let ageRange
+    let doc
+    try {
+        if (req.user) {
+            const user: JwtPayload = req.user as JwtPayload
+            doc = await User.findById(user.user._id)
+            ageRange = doc?.get("ageRange")
+        }
+    } catch(err) {
+        res.status(500).json({error: "Internal Server Error"})
+    }
+    let message = ""
+    switch (ageRange) {
+        case "13-14": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 13-14 for the response you give. "; break;
+        case "15-16": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 15-16 for the response you give. "; break;
+        case "17-19": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 17-19 for the response you give. "; break;
+        default: message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers for the response you give. "; break;
+    }
     try {
         const completion = await openai.chat.completions.create({
             messages:[
@@ -192,9 +241,40 @@ app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res
             model: "gpt-3.5-turbo",
         })
         const response = completion.choices[0].message.content
+        const userId = doc?.get("_id")
+        const getResponse = await userResponse.findOne({userId: userId})
+
+        if (!getResponse) {
+            const newResponse = new userResponse({userId, info: response})
+            newResponse.save()
+        } else {
+            let getInfo = getResponse?.get("info")
+            if (getInfo) {
+                getInfo += `\n\n\n${response}`
+                getResponse.set("info", getInfo)
+                await getResponse.save()
+            }
+        }
         res.send(response)
     } catch (err) {
         res.status(400).json({error: "Can't connect to openAI api"})
+    }
+})
+
+app.post("/getResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+    try {
+        if (req.user) {
+            const user: JwtPayload = req.user as JwtPayload
+            const data = await User.findById(user.user._id)
+            const userId = data?.get("_id")
+            const getResponse = await userResponse.findOne({userId: userId})
+            const info = getResponse?.get("info")
+            res.json({info})
+        } else {
+            res.status(500).json({error: "can't find user"})
+        }
+    } catch (err) {
+        res.status(500).json({error: "Internal Server Error"})
     }
 })
 

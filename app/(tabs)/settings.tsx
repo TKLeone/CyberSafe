@@ -1,13 +1,18 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import axios, { AxiosError } from "axios"
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native"
 import { router } from "expo-router"
-
 import * as SecureStore from "expo-secure-store"
 
 // TODO: potentially add colour themes
-// TODO: add account information
 const App = () => {
+  const [email, setEmail] = useState<string>("")
+  const [ageRange, setAgeRange] = useState<string>("")
+  const [gender, SetGender] = useState<string>("")
+
+  useEffect(()=> {
+    getAccountInfo()
+  })
 
   const logOut = async () => {
     try {
@@ -37,6 +42,29 @@ const App = () => {
     }
   }
 
+  interface userData {
+    email: string,
+    ageRange: string,
+    gender: string
+  }
+
+  const getAccountInfo = async () => {
+    const token = await SecureStore.getItemAsync("jwt")
+    try {
+      const response = await axios.post("http://192.168.1.100:8001/getAccountInfo", {token})
+      const {email, ageRange, gender } = response.data as userData
+      setEmail(email)
+      setAgeRange(ageRange)
+      SetGender(gender)
+
+    } catch (err) {
+      const axiosError = err as AxiosError
+      if (axiosError.response && axiosError.response.status === 500) {
+
+      }
+    }
+  }
+
   // NOTE: add an effect when they long press so they know what they're doing
   // or add a tooltip telling them what to do
   return (
@@ -53,6 +81,12 @@ const App = () => {
           <Text> Delete Account </Text>
         </Pressable>
       </View>
+      <View style={styles.accountInfoContainer}>
+        <Text> Account Information...</Text>
+        <Text> {email}</Text>
+        <Text> {ageRange}</Text>
+        <Text> {gender}</Text>
+      </View>
     </SafeAreaView>
   )
 }
@@ -60,6 +94,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#212121",
   },
   logOutContainer: {
     position:"absolute",
@@ -69,6 +104,7 @@ const styles = StyleSheet.create({
   buttons: {
     width: "80%",
     padding: 10,
+    backgroundColor: "#A9A9A9",
     color: "red",
     borderWidth: 1,
     borderRadius: 10,
@@ -82,6 +118,11 @@ const styles = StyleSheet.create({
   },
   deleteAccountText: {
 
+  },
+  accountInfoContainer: {
+    position: "absolute",
+    top: 400,
+    width: "100%"
   }
 })
 export default App

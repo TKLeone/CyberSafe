@@ -104,6 +104,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#212121",
     justifyContent: "flex-start",
     paddingTop: 20,
   },
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     height: 50,
     textAlign: "center",
     justifyContent: "center",
-    backgroundColor: "white",
+    backgroundColor: "#A9A9A9",
     padding: 10,
     margin: 5,
     borderRadius: 10,
