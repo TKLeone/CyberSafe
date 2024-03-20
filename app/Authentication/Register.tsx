@@ -67,11 +67,7 @@ const UserForm = () => {
     {label: "15-16", value: "15-16"},
     {label: "17-19", value: "17-19"},
   ]
-  const genderData = [
-    {label: "male", value: "male"},
-    {label: "female", value: "female"},
-    {label: "prefer not to say", value: "undisclosed"},
-  ]
+
   const handleEmailChange = (value: string) => {
     setEmailError('')
     setEmail(value)
@@ -86,6 +82,7 @@ const UserForm = () => {
     return validator.isEmail(email)
   }
 
+  // TODO: styling for age range
   return(
   <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>
@@ -128,11 +125,10 @@ const UserForm = () => {
   )
 }
 
-// TODO: styling for log in page
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#212121",
+    backgroundColor: "#181b20",
     justifyContent: "center",
     alignItems: "center",
     padding: 20,

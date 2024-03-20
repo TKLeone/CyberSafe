@@ -3,13 +3,19 @@ import {router} from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient'
 import validateJWT from "./Authentication/validateJWT"
 import {useEffect} from 'react'
+import { useFonts} from "expo-font"
 
 
+// TODO: fix opensans font warning 
 const HomePage = () => {
-
   useEffect(() => {
     validateJWT(true)
   }, [])
+
+  useFonts({
+    "OpenSansBold": require("./assets/fonts/OpenSans-Bold.ttf"),
+    "OpenSansRegular": require("./assets/fonts/OpenSans-Regular.ttf"),
+  })
 
   const goToLogin = () =>{
     router.navigate("/Authentication/Login")
@@ -34,7 +40,7 @@ const HomePage = () => {
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "#212121",
+    backgroundColor: "#181b20",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -53,8 +59,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     color: "black",
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
     textAlign: "center",
+    fontFamily: "OpenSansBold"
   },
 })
 

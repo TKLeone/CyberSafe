@@ -5,6 +5,7 @@ import validateJWT from "../Authentication/validateJWT"
 import axios, { AxiosError } from "axios"
 import { FontAwesome } from '@expo/vector-icons'
 import * as SecureStore from "expo-secure-store"
+import { useFonts} from "expo-font"
 
 interface buttonData {
   importance: number,
@@ -15,17 +16,18 @@ interface userData {
   ageRange: string,
 }
 
+// TODO: add more topics and info
 const buttons: buttonData[] = [
-  {importance: 1, label: "Phishing"},
+  {importance: 1, label: "PHISHING"},
   {importance: 2, label: "REPLACE VALUE"},
-  {importance: 3, label: "Cyber-bullying"},
-  {importance: 4, label: "Online Predators"},
-  {importance: 5, label: "Peer Pressure"},
-  {importance: 6, label: "Malware"},
-  {importance: 7, label: "Privacy Settings"},
-  {importance: 8, label: "Online Content"},
-  {importance: 9, label: "Online Dating"},
-  {importance: 10, label: "Identifying scams"},
+  {importance: 3, label: "CYBER BULLYING"},
+  {importance: 4, label: "ONLINE PREDATORS"},
+  {importance: 5, label: "PEER PRESSURE"},
+  {importance: 6, label: "MALWARE"},
+  {importance: 7, label: "PRIVACY SETTINGS"},
+  {importance: 8, label: "ONLINE CONTENT"},
+  {importance: 9, label: "ONLINE DATING"},
+  {importance: 10, label: "IDENTIFYING SCAMS"},
 ]
 
 const updateButtonImportance =  (buttons: buttonData[], ageRangeData: string) => {
@@ -49,12 +51,24 @@ const updateButtonImportance =  (buttons: buttonData[], ageRangeData: string) =>
 const App = () => {
   const [ageRange, setAgeRange] = useState<string>("")
   const [showServerError, setShowServerError] = useState<boolean>(false)
+  const [isSingleColumn, setIsSingleColumn] = useState<boolean>(false)
+
+  useFonts({
+    "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
+    "OpenSansRegular": require("../assets/fonts/OpenSans-Regular.ttf"),
+  })
+
+  const toggleButtonLayout = () => {
+    setIsSingleColumn((prevState) => !prevState)
+  }
 
   const fetchData = async () => {
     const token = await SecureStore.getItemAsync("jwt")
     try {
       const response = await axios.post("http://192.168.1.100:8001/ageRange", {token},{withCredentials: true})
       const {ageRange} = response.data as userData
+      setShowServerError(false)
+      console.log("server error")
       return {ageRange}
     } catch (err) {
       const axiosError = err as AxiosError
@@ -66,11 +80,15 @@ const App = () => {
 
   useEffect(() => {
     validateJWT(false)
+    console.log("why isn't this triggering")
     fetchData().then((data) => {
       if (data) {
-      setAgeRange(data.ageRange)
+        setAgeRange(data.ageRange)
       }
     })
+    return () => {
+      setShowServerError(false)
+    }
   },[])
 
   const updatedButtons = ageRange ? updateButtonImportance(buttons, ageRange) : buttons
@@ -89,27 +107,38 @@ const App = () => {
           <Text> An error has occured </Text>
         </View>
       )}
+      <View style={styles.header}>
+        <Text style={styles.headerText}> Security Topics </Text>
+      </View>
       <View style={styles.buttonContainer}>
-      {sortedButtons.map((button) => (
-        <Pressable key={button.importance} onPress={() => handleClick(button.label, ageRange)} style={styles.button}>
-            <Text>{button.label}</Text>
-        </Pressable>
-      ))}
+        {sortedButtons.map((button) => (
+          <Pressable key={button.importance} onPress={() => handleClick(button.label, ageRange)} style={styles.button}>
+            <Text style={styles.labelText}>{button.label}</Text>
+          </Pressable>
+        ))}
       </View>
     </SafeAreaView>
   )
 }
 
-// TODO: change to one button per row
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#212121",
+    backgroundColor: "#181b20",
     justifyContent: "flex-start",
     paddingTop: 20,
   },
   serverError: {
     alignSelf: "center"
+  },
+  header: {
+    alignSelf: "center",
+  },
+  headerText: {
+    color: "white",
+    margin: 10,
+    fontFamily: "OpenSansBold",
+    fontSize: 30,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -119,15 +148,21 @@ const styles = StyleSheet.create({
     paddingTop: 10, 
   },
   button: {
-    width: 175,
-    height: 50,
+    width: 182,
+    height: 110,
     textAlign: "center",
     justifyContent: "center",
-    backgroundColor: "#A9A9A9",
+    backgroundColor: "#445565",
     padding: 10,
     margin: 5,
-    borderRadius: 10,
+    borderRadius: 25,
   },
+  labelText: {
+    color: "white",
+    margin: 10,
+    fontFamily: "OpenSansBold",
+    fontSize: 22,
+  }
 })
 
 export default App

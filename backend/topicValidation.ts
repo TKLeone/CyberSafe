@@ -1,22 +1,22 @@
 export const topicValidation = (label: string) => {
     switch (label) {
-        case "Phishing":
+        case "PHISHING":
             return "phishing"
-        case "Identifying scams":
+        case "IDENTIFYING SCAMS":
             return "scams"
-        case "Peer Pressure":
+        case "PEER PRESSURE":
             return "peer_pressure"
-        case "Online Predators":
+        case "ONLINE PREDATORS":
             return "online_predators"
-        case "Malware":
+        case "MALWARE":
             return "malware"
-        case "Privacy Settings":
+        case "PRIVACY SETTINGS":
             return "priv_settings"
-        case "Online Content":
+        case "ONLINE CONTENT":
             return "online_content"
-        case "Cyber-bullying":
+        case "CYBER BULLYING":
             return "cyber_bullying"
-        case "Online Dating":
+        case "ONLINE DATING":
             return "online_dating"
         default:
             return label

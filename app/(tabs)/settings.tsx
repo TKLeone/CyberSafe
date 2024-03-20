@@ -3,14 +3,21 @@ import axios, { AxiosError } from "axios"
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native"
 import { router } from "expo-router"
 import * as SecureStore from "expo-secure-store"
+import { useFonts} from "expo-font"
+import validateJWT from "../Authentication/validateJWT"
 
-// TODO: potentially add colour themes
 const App = () => {
   const [email, setEmail] = useState<string>("")
   const [ageRange, setAgeRange] = useState<string>("")
-  const [gender, SetGender] = useState<string>("")
+
+  useFonts({
+    "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
+    "OpenSansRegular": require("../assets/fonts/OpenSans-Regular.ttf"),
+  })
+
 
   useEffect(()=> {
+    validateJWT(false)
     getAccountInfo()
   })
 
@@ -45,17 +52,15 @@ const App = () => {
   interface userData {
     email: string,
     ageRange: string,
-    gender: string
   }
 
   const getAccountInfo = async () => {
     const token = await SecureStore.getItemAsync("jwt")
     try {
       const response = await axios.post("http://192.168.1.100:8001/getAccountInfo", {token})
-      const {email, ageRange, gender } = response.data as userData
+      const {email, ageRange} = response.data as userData
       setEmail(email)
       setAgeRange(ageRange)
-      SetGender(gender)
 
     } catch (err) {
       const axiosError = err as AxiosError
@@ -65,27 +70,49 @@ const App = () => {
     }
   }
 
+  const deleteResponses = async () => {
+    const token = await SecureStore.getItemAsync("jwt")
+    try {
+      const response = await axios.post("http://192.168.1.100:8001/deleteResponse", {token})
+
+    } catch (err) {
+      const axiosError = err as AxiosError
+
+      if (axiosError.response && axiosError.response.status === 500) {
+
+      }
+    }
+  }
+
   // NOTE: add an effect when they long press so they know what they're doing
   // or add a tooltip telling them what to do
+  // TODO: popup when you delete account and delete response
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logOutContainer}>
         <Text style={styles.logOutText}>Log out your account... </Text>
         <Pressable style={styles.buttons} onPress={() => logOut()}>
-          <Text> Log out </Text>
+          <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Log out </Text>
         </Pressable>
       </View>
       <View style={styles.deleteAccountContainer}>
         <Text style={styles.deleteAccountText}> Delete your account... </Text>
         <Pressable style={styles.buttons} delayLongPress={2000} onLongPress={() => deleteAccount()}>
-          <Text> Delete Account </Text>
+          <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Delete Account </Text>
         </Pressable>
       </View>
       <View style={styles.accountInfoContainer}>
-        <Text> Account Information...</Text>
-        <Text> {email}</Text>
-        <Text> {ageRange}</Text>
-        <Text> {gender}</Text>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 20,color: "#FF954F"}}> Account Information...</Text>
+        <View style={styles.accountInfo}>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 18, color: "white"}}> E-mail: {email}</Text>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 18, color: "white"}}> Age Range: {ageRange}</Text>
+        </View>
+      </View>
+      <View style={styles.deleteResponsesContainer}>
+        <Text style={styles.deleteResponsesText}>Delete Responses...</Text>
+        <Pressable style={styles.buttons} onPress={() => deleteResponses()}>
+          <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Delete Responses </Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   )
@@ -94,35 +121,57 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#212121",
+    backgroundColor: "#181b20",
   },
   logOutContainer: {
     position:"absolute",
     top: 100,
     width: "100%",
+    left: 10,
   },
   buttons: {
     width: "80%",
     padding: 10,
-    backgroundColor: "#A9A9A9",
+    backgroundColor: "#445565",
     color: "red",
-    borderWidth: 1,
     borderRadius: 10,
-    borderColor: "black",
   },
-  logOutText: {},
+  logOutText: {
+    fontFamily: "OpenSansBold",
+    fontSize: 18,
+    color: "#FF954F",
+  },
   deleteAccountContainer: {
     position: "absolute",
     top: 200,
-    width: "100%"
+    width: "100%",
+    left: 10,
   },
   deleteAccountText: {
-
+    fontFamily: "OpenSansBold",
+    fontSize: 20,
+    color: "#FF954F",
   },
   accountInfoContainer: {
     position: "absolute",
-    top: 400,
-    width: "100%"
-  }
+    top: 300,
+    width: "80%",
+    left: 10,
+  },
+  accountInfo: {
+    borderRadius: 10,
+    backgroundColor: "#445565",
+  },
+  deleteResponsesContainer: {
+    position: "absolute",
+    top: 430,
+    width: "80%",
+    left: 10,
+  },
+  deleteResponsesText: {
+    fontFamily: "OpenSansBold",
+    fontSize: 20,
+    color: "#FF954F",
+  },
 })
 export default App

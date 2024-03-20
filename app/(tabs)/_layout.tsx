@@ -3,7 +3,14 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 
 export default () => {
   return (
-  <Tabs screenOptions={{ headerShown: false }}>
+  <Tabs 
+      screenOptions={{ 
+        headerShown: false,
+        tabBarStyle: {backgroundColor: "#536878"},
+        tabBarInactiveTintColor: "white",
+        tabBarActiveTintColor: "#FF954F",
+      }}
+    >
       <Tabs.Screen
         name="topics"
         options={{

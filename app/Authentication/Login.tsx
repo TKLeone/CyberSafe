@@ -5,11 +5,18 @@ import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-nat
 import {router} from "expo-router"
 import validator from "validator"
 import * as Securestore from "expo-secure-store"
+import { useFonts} from "expo-font"
+
 const UserForm = () => {
   const[email, setEmail] = React.useState<string>('')
   const[password, setPassword] = React.useState<string>('')
   const[emailError, setEmailError] = React.useState<string>('')
   const[passwordError, setPasswordError] = React.useState<string>('')
+
+  useFonts({
+    "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
+    "OpenSansRegular": require("../assets/fonts/OpenSans-Regular.ttf"),
+  })
 
   const handleLogin = async () => {
     let hasErrors: boolean = false
@@ -86,7 +93,7 @@ const UserForm = () => {
         />
         <Text style={styles.errors}> {passwordError} </Text>
         <Pressable style={styles.button} onPress={handleLogin}>
-          <Text> Login </Text>
+          <Text style={{fontFamily: "OpenSansBold", fontSize: 18}}> Login </Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -99,7 +106,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#212121",
+    backgroundColor: "#181b20",
   },
   inputContainer: {
     width: "85%",
@@ -111,7 +118,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 18,
-    height: 55
+    height: 55,
+    fontFamily: "OpenSansBold",
+    fontSize: 15,
   },
   button: {
     backgroundColor: "#FF954F",
@@ -119,12 +128,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 18
+    fontFamily: "OpenSansBold",
+    fontSize: 18,
   },
   errors: {
     alignItems: "center",

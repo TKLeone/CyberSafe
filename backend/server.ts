@@ -89,7 +89,7 @@ app.post("/login", async (req: Request, res: Response) => {
         const secretKey: string = process.env.SECRET_KEY as string;
         try {
             if(secretKey){
-                const token = jwt.sign({user}, secretKey, { expiresIn: '20m' })
+                const token = jwt.sign({user}, secretKey, { expiresIn: '5m' })
 
                 return res.send(token).status(200)
             } else {
@@ -113,7 +113,7 @@ app.post("/getAccountInfo", cookieJWTAuth, async (req: IGetAuthenticatedRequest,
     try {
         if (req.user) {
             const user: JwtPayload = req.user as JwtPayload
-            const data = await User.findById(user.user._id).select("email ageRange gender -_id")
+            const data = await User.findById(user.user._id).select("email ageRange -_id")
             if (data) {
                 res.json(data)
             } else {
@@ -233,6 +233,8 @@ app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res
         default: message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers for the response you give. "; break;
     }
     try {
+        // TODO: use the moderations api to check if message is bad
+        // NOTE: if it's bad then don't add to db and don't use completions api, if it's good then add to db 
         const completion = await openai.chat.completions.create({
             messages:[
                 {"role": "system", "content": message},
@@ -272,6 +274,34 @@ app.post("/getResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest, re
             res.json({info})
         } else {
             res.status(500).json({error: "can't find user"})
+        }
+    } catch (err) {
+        res.status(500).json({error: "Internal Server Error"})
+    }
+})
+
+
+app.post("/deleteResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
+    try {
+        if (req.user) {
+            const user: JwtPayload = req.user as JwtPayload
+            const doc = await User.findById(user.user._id)
+            const userId = doc?.get("_id")
+            if (userId) {
+                const getResponse = await userResponse.findOne({userId: userId})
+                if (getResponse) {
+                    const checkDeletion =  await getResponse.deleteOne()
+                    if (checkDeletion.deletedCount > 0) {
+                        res.status(200).json({message: "Responses deleted"})
+                    } else {
+                        res.status(500).json({error: "Could not delete"})
+                    }
+                } else {
+                    res.status(500).json({error: "Could not get response document"})
+                }
+            } else {
+                res.status(500).json({error: "Could not find user"})
+            }
         }
     } catch (err) {
         res.status(500).json({error: "Internal Server Error"})
