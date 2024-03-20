@@ -90,26 +90,26 @@ const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logOutContainer}>
-        <Text style={styles.logOutText}>Log out your account... </Text>
+        <Text style={styles.logOutText}>Log out your account </Text>
         <Pressable style={styles.buttons} onPress={() => logOut()}>
           <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Log out </Text>
         </Pressable>
       </View>
       <View style={styles.deleteAccountContainer}>
-        <Text style={styles.deleteAccountText}> Delete your account... </Text>
+        <Text style={styles.deleteAccountText}> Delete your account</Text>
         <Pressable style={styles.buttons} delayLongPress={2000} onLongPress={() => deleteAccount()}>
           <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Delete Account </Text>
         </Pressable>
       </View>
       <View style={styles.accountInfoContainer}>
-        <Text style={{fontFamily: "OpenSansBold", fontSize: 20,color: "#FF954F"}}> Account Information...</Text>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 20,color: "#FF954F", marginBottom: 5}}> Account Information</Text>
         <View style={styles.accountInfo}>
-        <Text style={{fontFamily: "OpenSansBold", fontSize: 18, color: "white"}}> E-mail: {email}</Text>
-        <Text style={{fontFamily: "OpenSansBold", fontSize: 18, color: "white"}}> Age Range: {ageRange}</Text>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 18, color: "white", padding: 10}}>E-mail: {email}</Text>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 18, color: "white", padding: 10}}>Age Range: {ageRange}</Text>
         </View>
       </View>
       <View style={styles.deleteResponsesContainer}>
-        <Text style={styles.deleteResponsesText}>Delete Responses...</Text>
+        <Text style={styles.deleteResponsesText}>Delete Responses</Text>
         <Pressable style={styles.buttons} onPress={() => deleteResponses()}>
           <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Delete Responses </Text>
         </Pressable>
@@ -134,12 +134,13 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#445565",
     color: "red",
-    borderRadius: 10,
+    borderRadius: 8,
   },
   logOutText: {
     fontFamily: "OpenSansBold",
     fontSize: 18,
     color: "#FF954F",
+    marginBottom: 5,
   },
   deleteAccountContainer: {
     position: "absolute",
@@ -151,6 +152,7 @@ const styles = StyleSheet.create({
     fontFamily: "OpenSansBold",
     fontSize: 20,
     color: "#FF954F",
+    marginBottom: 5,
   },
   accountInfoContainer: {
     position: "absolute",
@@ -159,12 +161,13 @@ const styles = StyleSheet.create({
     left: 10,
   },
   accountInfo: {
-    borderRadius: 10,
+    borderRadius: 8,
     backgroundColor: "#445565",
+    marginBottom: 5,
   },
   deleteResponsesContainer: {
     position: "absolute",
-    top: 430,
+    top: 450,
     width: "80%",
     left: 10,
   },
@@ -172,6 +175,7 @@ const styles = StyleSheet.create({
     fontFamily: "OpenSansBold",
     fontSize: 20,
     color: "#FF954F",
+    marginBottom: 5,
   },
 })
 export default App

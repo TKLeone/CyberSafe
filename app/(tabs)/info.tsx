@@ -115,7 +115,7 @@ const App = () => {
               </Text>
               <View style={styles.readMoreContainer}>
                 <FontAwesome name="info-circle" size={24} color="#FF954F" top={5} />
-                <Text style={styles.readMoreText}>Click to read more...</Text>
+                <Text style={styles.readMoreText}>Click to read more..</Text>
               </View>
             </Pressable>
           ))}
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   textBoxContainer: {
     width: "95%",
     margin: 8,
-    borderRadius: 10,
+    borderRadius: 5,
     overflow: "hidden",
   },
   textBox: {
@@ -190,7 +190,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
     fontFamily: "OpenSansBold",
   },
   readMoreContainer: {
@@ -228,7 +227,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   infoTextContainer: {
-    borderRadius: 10,
+    borderRadius: 7,
     overflow: "hidden",
   },
   infoText: {

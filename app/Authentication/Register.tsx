@@ -5,7 +5,7 @@ import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "re
 import { Dropdown} from "react-native-element-dropdown"
 import {router} from "expo-router"
 import validator from "validator"
-import * as SecureStore from "expo-secure-store"
+import { useFonts} from "expo-font"
 
 const UserForm = () => {
   const[password, setPassword] = React.useState<string>('')
@@ -14,6 +14,11 @@ const UserForm = () => {
   const[passwordError, setPasswordError] = React.useState<string>('')
   const[emailError, setEmailError] = React.useState<string>('')
   const[ageRangeError, setAgeRangeError] = React.useState<string>('')
+
+  useFonts({
+    "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
+    "OpenSansRegular": require("../assets/fonts/OpenSans-Regular.ttf"),
+  })
 
   const handleSubmit = async() => {
     let hasErrors: boolean = false;
@@ -118,7 +123,7 @@ const UserForm = () => {
           }}
         />
         <Pressable style={styles.button} onPress={handleSubmit}>
-          <Text> Register </Text>
+          <Text style={styles.buttonText}> Register </Text>
         </Pressable>
       </View>
   </SafeAreaView>
@@ -143,7 +148,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
-    height: 55
+    height: 55,
+    fontFamily: "OpenSansBold",
+    fontSize: 15
   },
   button: {
     backgroundColor: "#FF954F",
@@ -154,9 +161,9 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 18
+    color: "black",
+    fontSize: 20,
+    fontFamily: "OpenSansBold"
   },
   errors: {
     alignItems: "center",

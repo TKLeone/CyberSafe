@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   headerText: {
-    color: "white",
+    color: "#FF954F",
     margin: 10,
     fontFamily: "OpenSansBold",
     fontSize: 30,

@@ -132,9 +132,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontWeight: "bold",
     fontFamily: "OpenSansBold",
-    fontSize: 18,
+    fontSize: 20,
   },
   errors: {
     alignItems: "center",
