@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios"
-import { Entypo } from '@expo/vector-icons'
+import { Entypo } from "@expo/vector-icons"
 import React from "react"
 import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native"
 import {router} from "expo-router"
@@ -8,10 +8,10 @@ import * as Securestore from "expo-secure-store"
 import { useFonts} from "expo-font"
 
 const UserForm = () => {
-  const[email, setEmail] = React.useState<string>('')
-  const[password, setPassword] = React.useState<string>('')
-  const[emailError, setEmailError] = React.useState<string>('')
-  const[passwordError, setPasswordError] = React.useState<string>('')
+  const[email, setEmail] = React.useState<string>("")
+  const[password, setPassword] = React.useState<string>("")
+  const[emailError, setEmailError] = React.useState<string>("")
+  const[passwordError, setPasswordError] = React.useState<string>("")
 
   useFonts({
     "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
@@ -37,7 +37,7 @@ const UserForm = () => {
       return
     }
 
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       email: email,
       password: password,
     })
@@ -58,12 +58,12 @@ const UserForm = () => {
   }
 
   const handleEmailChange = (value: string) => {
-    setEmailError('')
+    setEmailError("")
     setEmail(value)
   }
 
   const handlePasswordChange = (value: string) => {
-    setPasswordError('')
+    setPasswordError("")
     setPassword(value)
   }
 

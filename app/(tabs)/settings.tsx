@@ -73,7 +73,7 @@ const App = () => {
   const deleteResponses = async () => {
     const token = await SecureStore.getItemAsync("jwt")
     try {
-      const response = await axios.post("http://192.168.1.100:8001/deleteResponse", {token})
+      await axios.post("http://192.168.1.100:8001/deleteResponse", {token})
 
     } catch (err) {
       const axiosError = err as AxiosError

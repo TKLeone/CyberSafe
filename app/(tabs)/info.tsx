@@ -3,12 +3,12 @@ import {router, useLocalSearchParams} from "expo-router"
 import {Animated, Text, SafeAreaView, View, ScrollView, StyleSheet, Pressable} from "react-native"
 import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
-import { Entypo, FontAwesome } from '@expo/vector-icons'
+import { Entypo, FontAwesome } from "@expo/vector-icons"
 import * as SecureStore from "expo-secure-store"
 import {useFonts} from "expo-font"
 
 const App = () => {
-  const [extraInfo, setExtraInfo] = useState<string>('')
+  const [extraInfo, setExtraInfo] = useState<string>("")
   const [showInfoBox, setShowInfoBox] = useState<boolean>(false)
   const [segmentedTopicText, setSegmentedTopictext] = useState<string[]>([""])
   const [segmentedInfoText, setSegmentedInfoText] = useState<string[]>([""])
@@ -21,11 +21,10 @@ const App = () => {
     "OpenSansRegular": require("../assets/fonts/OpenSans-Regular.ttf"),
   })
 
-  const fetchData = async (label: string | string[], ageRange: string | string[]) => {
+  const fetchData = async (label: string | string[]) => {
     const token = await SecureStore.getItemAsync("jwt")
     const sendData = JSON.stringify({
       label: label,
-      ageRange: ageRange,
       token
     })
     try {
@@ -47,12 +46,11 @@ const App = () => {
 
   const params   = useLocalSearchParams()
   const label    = params.label ? params.label : ""
-  const ageRange = params.ageRange ? params.ageRange : ""
 
   useEffect(() => {
     validateJWT(false)
-    fetchData(label, ageRange)
-    if (label === "" && ageRange === "") {
+    fetchData(label)
+    if (label === "" ) {
       router.navigate("/topics")
     }
     return () => {
@@ -61,7 +59,7 @@ const App = () => {
       setSegmentedTopictext([])
       closeInfoBox()
     }
-  },[label, ageRange])
+  },[label])
 
   const mapExtraInfo = (index: number, segmentedInfoText: string[]): string => {
     const unchangedString = segmentedInfoText[index]
@@ -114,7 +112,7 @@ const App = () => {
                 {text}
               </Text>
               <View style={styles.readMoreContainer}>
-                <FontAwesome name="info-circle" size={24} color="#FF954F" top={5} />
+                <FontAwesome name="info-circle" size={18} color="#FF954F" top={5} />
                 <Text style={styles.readMoreText}>Click to read more..</Text>
               </View>
             </Pressable>
@@ -151,7 +149,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#212121",
+    backgroundColor: "#181b20",
     justifyContent: "center",
     alignItems: "center"
   },

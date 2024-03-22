@@ -4,6 +4,7 @@ import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
 import * as SecureStore from "expo-secure-store"
 import { useFonts} from "expo-font"
+
 const App = () => {
   const [segmentedResponseData, setSegmentedResponseData] = useState<string[]>([""])
 

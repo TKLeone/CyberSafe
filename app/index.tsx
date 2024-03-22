@@ -1,8 +1,7 @@
-import {Text, SafeAreaView, StyleSheet, Pressable} from "react-native";
-import {router} from "expo-router";
-import { LinearGradient } from 'expo-linear-gradient'
+import {Image, Text, SafeAreaView, StyleSheet, Pressable} from "react-native"
+import {router} from "expo-router"
 import validateJWT from "./Authentication/validateJWT"
-import {useEffect} from 'react'
+import React, {useEffect} from "react"
 import { useFonts} from "expo-font"
 
 
@@ -27,7 +26,10 @@ const HomePage = () => {
 
   return (
     <SafeAreaView style={styles.root}>
-      <Text> Home Page</Text>
+      <Image 
+        style={styles.image}
+        source={require("./assets/CyberSafe.png")}
+      />
       <Pressable style={styles.button} onPress={goToRegister}>
         <Text style={[styles.buttonText]}> Register </Text>
       </Pressable>
@@ -42,8 +44,14 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: "#181b20",
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
+  },
+  image: {
+    width: 400,
+    height: 350,
+    top: 40,
+    resizeMode: "cover",
   },
   button: {
     width: "60%",
@@ -65,4 +73,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default HomePage;
+export default HomePage

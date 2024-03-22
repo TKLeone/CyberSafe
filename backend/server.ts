@@ -4,12 +4,10 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import cors from "cors"
 import dotenv from "dotenv"
-import cookieParser from "cookie-parser"
 import {cookieJWTAuth, IGetAuthenticatedRequest} from "./cookieJWTAuth"
 import { ITopics, topicSchema} from "./topicDB"
 import { topicValidation} from "./topicValidation"
 import OpenAI from "openai"
-import { PlatformColor } from "react-native"
 
 dotenv.config()
 const app = express()
@@ -49,9 +47,8 @@ userSchema.pre<IUsers>("save", async function (next) {
 
 const User: Model<IUsers> = userConn.model("users", userSchema)
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
+app.use(cors({ origin: "http://localhost:3000", credentials: true }))
 app.use(express.json())
-app.use(cookieParser())
 
 app.post("/users", async (req: Request, res: Response) => {
     try {
@@ -86,10 +83,10 @@ app.post("/login", async (req: Request, res: Response) => {
         if (!passwordMatch) {
             return res.status(401).json({error: "Password can't be found"})
         }
-        const secretKey: string = process.env.SECRET_KEY as string;
+        const secretKey: string = process.env.SECRET_KEY as string
         try {
             if(secretKey){
-                const token = jwt.sign({user}, secretKey, { expiresIn: '5m' })
+                const token = jwt.sign({user}, secretKey, { expiresIn: "5m" })
 
                 return res.send(token).status(200)
             } else {
@@ -123,19 +120,6 @@ app.post("/getAccountInfo", cookieJWTAuth, async (req: IGetAuthenticatedRequest,
             res.status(401).json({error: "User can't be foundd"})
         }
 
-    } catch (err) {
-        res.status(500).json({error: "Internal Server Error"})
-    }
-})
-app.get("/Logout", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
-    const token = req.body.token
-    try {
-        if (token) {
-            res.clearCookie("token").status(200).json({message: "Account has been logged out?"})
-        } else {
-            // reset content status code (205)
-            res.status(205).json({message: "Account has already been logged out"})
-        }
     } catch (err) {
         res.status(500).json({error: "Internal Server Error"})
     }
@@ -178,15 +162,10 @@ app.post("/ageRange", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: 
 const Topic: Model<ITopics> = userConn.model("topics", topicSchema)
 
 app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
-    let {label, ageRange} = req.body
-    const userAgeRange = await User.findOne({ageRange})
-    let newAgeRange = ""
-    if (userAgeRange) {
-        newAgeRange = userAgeRange.get("ageRange")
-    }
+    let {label} = req.body
 
     label = topicValidation(label)
-    let topicData = await Topic.findOne({[label]: {$exists: true}})
+    const topicData = await Topic.findOne({[label]: {$exists: true}})
     if (topicData) {
         const topic = topicData.get(label)
         const extraInfo = topicData.get("extra_info")
@@ -227,10 +206,10 @@ app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res
     }
     let message = ""
     switch (ageRange) {
-        case "13-14": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 13-14 for the response you give. "; break;
-        case "15-16": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 15-16 for the response you give. "; break;
-        case "17-19": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 17-19 for the response you give. "; break;
-        default: message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers for the response you give. "; break;
+        case "13-14": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 13-14 for the response you give. "; break
+        case "15-16": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 15-16 for the response you give. "; break
+        case "17-19": message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers aged 17-19 for the response you give. "; break
+        default: message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers for the response you give. "; break
     }
     try {
         // TODO: use the moderations api to check if message is bad
@@ -280,7 +259,6 @@ app.post("/getResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest, re
     }
 })
 
-
 app.post("/deleteResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     try {
         if (req.user) {
@@ -302,6 +280,8 @@ app.post("/deleteResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest,
             } else {
                 res.status(500).json({error: "Could not find user"})
             }
+        } else {
+            res.status(500).json({error: "User seemingly doesn't exist"})
         }
     } catch (err) {
         res.status(500).json({error: "Internal Server Error"})

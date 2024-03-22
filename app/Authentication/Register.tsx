@@ -1,19 +1,19 @@
 import axios, { AxiosError } from "axios"
-import { Entypo } from '@expo/vector-icons'
+import { Entypo } from "@expo/vector-icons"
 import React from "react"
-import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput, Image} from "react-native"
+import {Pressable, View, SafeAreaView,StyleSheet,Text,TextInput} from "react-native"
 import { Dropdown} from "react-native-element-dropdown"
 import {router} from "expo-router"
 import validator from "validator"
 import { useFonts} from "expo-font"
 
 const UserForm = () => {
-  const[password, setPassword] = React.useState<string>('')
-  const[email, setEmail]= React.useState<string>('')
-  const[ageRange, setAgeRange] = React.useState<string>('')
-  const[passwordError, setPasswordError] = React.useState<string>('')
-  const[emailError, setEmailError] = React.useState<string>('')
-  const[ageRangeError, setAgeRangeError] = React.useState<string>('')
+  const[password, setPassword] = React.useState<string>("")
+  const[email, setEmail]= React.useState<string>("")
+  const[ageRange, setAgeRange] = React.useState<string>("")
+  const[passwordError, setPasswordError] = React.useState<string>("")
+  const[emailError, setEmailError] = React.useState<string>("")
+  const[ageRangeError, setAgeRangeError] = React.useState<string>("")
 
   useFonts({
     "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
@@ -21,7 +21,7 @@ const UserForm = () => {
   })
 
   const handleSubmit = async() => {
-    let hasErrors: boolean = false;
+    let hasErrors: boolean = false
 
     if (!password) {
       setPasswordError("Password is required") 
@@ -41,11 +41,11 @@ const UserForm = () => {
     }
 
     if (hasErrors) {
-      return;
+      return
     }
 
     try {
-      let data = JSON.stringify ({
+      const data = JSON.stringify ({
         password: password,
         email: email,
         ageRange: ageRange,
@@ -74,12 +74,12 @@ const UserForm = () => {
   ]
 
   const handleEmailChange = (value: string) => {
-    setEmailError('')
+    setEmailError("")
     setEmail(value)
   }
 
   const handlePasswordChange = (value: string) => {
-    setPasswordError('')
+    setPasswordError("")
     setPassword(value)
   }
 
@@ -113,6 +113,12 @@ const UserForm = () => {
         />
         <Text style={styles.errors}> {ageRangeError} </Text>
         <Dropdown
+          style={styles.ageRangeBox}
+          itemTextStyle={styles.itemText}
+          containerStyle={styles.dropDownContainer}
+          itemContainerStyle={styles.itemContainer}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
           data = {ageRangeData}
           labelField="label"
           valueField="value"
@@ -178,7 +184,40 @@ const styles = StyleSheet.create({
   exitIcon: {
     width: 20,
     height: 20,
+  },
+  ageRangeBox: {
+    height: 50,
+    backgroundColor: "#A9A9A9",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 20,
+  },
+  placeholderStyle: {
+    backgroundColor: "#A9A9A9",
+    color: "black",
+    borderRadius: 10,
+    fontFamily: "OpenSansBold",
+    fontSize: 15,
+  },
+  selectedTextStyle: {
+    backgroundColor: "#A9A9A9",
+    color: "black",
+    fontFamily: "OpenSansBold",
+    fontSize: 15,
+    borderRadius: 10,
+  },
+  dropDownContainer: {
+    backgroundColor: "#A9A9A9",
+    borderRadius: 10,
+  },
+  itemContainer: {
+    borderRadius: 10,
+  },
+  itemText: {
+    fontFamily: "OpenSansBold",
+    fontSize: 15,
   }
 })
+
 
 export default UserForm

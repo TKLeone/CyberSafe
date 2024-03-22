@@ -1,7 +1,8 @@
+import React from "react"
 import {Tabs} from "expo-router"
-import FontAwesome from '@expo/vector-icons/FontAwesome'
+import FontAwesome from "@expo/vector-icons/FontAwesome"
 
-export default () => {
+const navBar = () => {
   return (
   <Tabs 
       screenOptions={{ 
@@ -43,3 +44,5 @@ export default () => {
   </Tabs>
   )
 }
+
+export default navBar

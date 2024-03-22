@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import {Text, SafeAreaView, View, ScrollView, StyleSheet, Pressable, TextInput, Keyboard} from "react-native"
 import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome } from "@expo/vector-icons"
 import * as SecureStore from "expo-secure-store"
 import { useFonts} from "expo-font"
 
@@ -72,7 +72,7 @@ const App = () => {
     </SafeAreaView>
   )
 }
-// TODO:  fix css for whole page
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -97,6 +97,8 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderRadius: 10,
     padding: 10,
+    fontFamily: "OpenSansBold",
+    fontSize: 15
   },
   enterButton: {
     position: "absolute", 
@@ -115,4 +117,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
   },
-});export default App
+})
+
+export default App

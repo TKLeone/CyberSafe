@@ -1,9 +1,9 @@
-import {router, Link} from "expo-router"
+import {router} from "expo-router"
 import React, { useEffect, useState } from "react"
 import {Text, SafeAreaView, Pressable, StyleSheet, View } from "react-native"
 import validateJWT from "../Authentication/validateJWT"
 import axios, { AxiosError } from "axios"
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome } from "@expo/vector-icons"
 import * as SecureStore from "expo-secure-store"
 import { useFonts} from "expo-font"
 
@@ -51,16 +51,11 @@ const updateButtonImportance =  (buttons: buttonData[], ageRangeData: string) =>
 const App = () => {
   const [ageRange, setAgeRange] = useState<string>("")
   const [showServerError, setShowServerError] = useState<boolean>(false)
-  const [isSingleColumn, setIsSingleColumn] = useState<boolean>(false)
 
   useFonts({
     "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
     "OpenSansRegular": require("../assets/fonts/OpenSans-Regular.ttf"),
   })
-
-  const toggleButtonLayout = () => {
-    setIsSingleColumn((prevState) => !prevState)
-  }
 
   const fetchData = async () => {
     const token = await SecureStore.getItemAsync("jwt")
@@ -95,8 +90,8 @@ const App = () => {
 
   const sortedButtons = updatedButtons.slice().sort((a,b) => a.importance - b.importance)
 
-  const handleClick = (label: string, ageRange: string) => {
-    router.push({pathname: "/info", params: {label, ageRange}})
+  const handleClick = (label: string) => {
+    router.push({pathname: "/info", params: {label}})
   }
 
   return (
@@ -112,7 +107,7 @@ const App = () => {
       </View>
       <View style={styles.buttonContainer}>
         {sortedButtons.map((button) => (
-          <Pressable key={button.importance} onPress={() => handleClick(button.label, ageRange)} style={styles.button}>
+          <Pressable key={button.importance} onPress={() => handleClick(button.label)} style={styles.button}>
             <Text style={styles.labelText}>{button.label}</Text>
           </Pressable>
         ))}
@@ -152,6 +147,7 @@ const styles = StyleSheet.create({
     height: 110,
     textAlign: "center",
     justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#445565",
     padding: 10,
     margin: 5,
