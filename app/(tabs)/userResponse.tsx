@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useState } from "react"
 import {Text, SafeAreaView, View, ScrollView, StyleSheet} from "react-native"
 import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
 import * as SecureStore from "expo-secure-store"
 import { useFonts} from "expo-font"
 import { FontAwesome } from "@expo/vector-icons"
+import {useFocusEffect} from "expo-router"
 
 const App = () => {
   const [segmentedResponseData, setSegmentedResponseData] = useState<string[]>([""])
@@ -19,8 +20,10 @@ const App = () => {
     const token = await SecureStore.getItemAsync("jwt")
     try {
       const response = await axios.post("http://192.168.1.100:8001/getResponse", {token})
+      if(response.data === "empty") {
+        return setSegmentedResponseData([""])
+      }
       const segmentedResponseData: string[] = response.data.info.split("\n\n\n")
-
       setShowServerError(false)
       setSegmentedResponseData(segmentedResponseData)
 
@@ -32,13 +35,20 @@ const App = () => {
     }
   }
 
-  useEffect(() => {
-    validateJWT(false)
-    fetchData()
-  },[])
+  useFocusEffect(
+    useCallback(() => {
+      validateJWT(false)
+      fetchData()
+      return () => {
+      }
+    },[])
+  )
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}> GPT Responses</Text>
+      </View>
       <View style={styles.scrollView}>
         {segmentedResponseData.length > 0 && segmentedResponseData[0] !== "" ? (
           <ScrollView
@@ -67,6 +77,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#181b20",
+    fontSize: 30,
+  },
+  header: {
+  },
+  headerText: {
+    color: "#FF954F",
+    margin: 10,
+    fontFamily: "OpenSansBold",
     fontSize: 30,
   },
   serverError: {

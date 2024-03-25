@@ -60,6 +60,7 @@ app.post("/users", async (req: Request, res: Response) => {
         let {password, email, ageRange} = req.body
         email = email.toLowerCase()
         const existingUser =  await User.findOne({email})
+
         if (existingUser) {
             return res.status(400).json({email: "Email already exists"})
         }
@@ -117,7 +118,6 @@ app.post("/getAccountInfo", cookieJWTAuth, async (req: IGetAuthenticatedRequest,
         } else {
             res.status(401).json({error: "User can't be foundd"})
         }
-
     } catch (err) {
         res.status(500).json({error: "Internal Server Error"})
     }
@@ -247,6 +247,9 @@ app.post("/getResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest, re
             const data = await User.findById(user.user._id)
             const userId = data?.get("_id")
             const getResponse = await userResponse.findOne({userId: userId})
+            if (!getResponse) {
+                return res.send("empty")
+            }
             const info = getResponse?.get("info")
             res.status(200).json({info})
         } else {

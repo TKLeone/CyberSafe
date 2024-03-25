@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   accountInfoContainer: {
     position: "absolute",
-    top: 350,
+    top: 335,
     width: "80%",
     left: 10,
   },

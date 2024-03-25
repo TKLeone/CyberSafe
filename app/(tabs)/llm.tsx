@@ -134,7 +134,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: "#FF954F",
+    
   },
 })
 
