@@ -5,16 +5,17 @@ import { router } from "expo-router"
 import * as SecureStore from "expo-secure-store"
 import { useFonts} from "expo-font"
 import validateJWT from "../Authentication/validateJWT"
+import { FontAwesome } from "@expo/vector-icons"
 
 const App = () => {
   const [email, setEmail] = useState<string>("")
   const [ageRange, setAgeRange] = useState<string>("")
+  const [showServerError, setShowServerError] = useState<boolean>(false)
 
   useFonts({
     "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
     "OpenSansRegular": require("../assets/fonts/OpenSans-Regular.ttf"),
   })
-
 
   useEffect(()=> {
     validateJWT(false)
@@ -24,11 +25,12 @@ const App = () => {
   const logOut = async () => {
     try {
         await SecureStore.deleteItemAsync("jwt")
+        setShowServerError(false)
         router.replace("/")
     } catch (err) {
       const axiosError = err as AxiosError
       if(axiosError.response && axiosError.response.status === 500){
-        // NOTE: do something
+        setShowServerError(true)
       }
     }
   }
@@ -41,10 +43,11 @@ const App = () => {
         await SecureStore.deleteItemAsync("jwt")
         router.replace("/")
       }
+      setShowServerError(false)
     } catch (err) {
       const axiosError = err as AxiosError
       if (axiosError.response && axiosError.response.status) {
-        // NOTE: add the pop up
+        setShowServerError(true)
       }
     }
   }
@@ -58,6 +61,7 @@ const App = () => {
     const token = await SecureStore.getItemAsync("jwt")
     try {
       const response = await axios.post("http://192.168.1.100:8001/getAccountInfo", {token})
+      setShowServerError(false)
       const {email, ageRange} = response.data as userData
       setEmail(email)
       setAgeRange(ageRange)
@@ -65,7 +69,7 @@ const App = () => {
     } catch (err) {
       const axiosError = err as AxiosError
       if (axiosError.response && axiosError.response.status === 500) {
-
+        setShowServerError(true)
       }
     }
   }
@@ -74,19 +78,15 @@ const App = () => {
     const token = await SecureStore.getItemAsync("jwt")
     try {
       await axios.post("http://192.168.1.100:8001/deleteResponse", {token})
-
+      setShowServerError(true)
     } catch (err) {
       const axiosError = err as AxiosError
-
       if (axiosError.response && axiosError.response.status === 500) {
-
+        setShowServerError(true)
       }
     }
   }
 
-  // NOTE: add an effect when they long press so they know what they're doing
-  // or add a tooltip telling them what to do
-  // TODO: popup when you delete account and delete response
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logOutContainer}>
@@ -97,6 +97,10 @@ const App = () => {
       </View>
       <View style={styles.deleteAccountContainer}>
         <Text style={styles.deleteAccountText}> Delete your account</Text>
+        <View style={styles.deleteTipContainer}>
+          <FontAwesome style={styles.infoCircle} name="info-circle" size={16} color="black" top={5} />
+          <Text style={styles.deleteTip}> Hold for 2 seconds </Text>
+        </View>
         <Pressable style={styles.buttons} delayLongPress={2000} onLongPress={() => deleteAccount()}>
           <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Delete Account </Text>
         </Pressable>
@@ -114,6 +118,12 @@ const App = () => {
           <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> Delete Responses </Text>
         </Pressable>
       </View>
+      {showServerError && (
+        <View style={styles.serverError}>
+          <FontAwesome style={styles.serverVector} name="server" size={24} color="black" />
+          <Text> An error has occured </Text>
+        </View>
+      )}
     </SafeAreaView>
   )
 }
@@ -122,6 +132,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#181b20",
+  },
+  serverError: {
+    position: "absolute",
+    width: "60%",
+    height: 225,
+    backgroundColor: "red",
+    top: 200,
+    borderRadius: 10,
+  },
+  serverVector: {
+    position: "absolute",
+    alignSelf: "center",
+    top: 60,
   },
   logOutContainer: {
     position:"absolute",
@@ -154,9 +177,31 @@ const styles = StyleSheet.create({
     color: "#FF954F",
     marginBottom: 5,
   },
+  deleteTipContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 10,
+    backgroundColor: "red",
+    width: "80%",
+    opacity: 0.65,
+    marginBottom: 5,
+    padding: 2,
+  },
+  infoCircle: {
+    top: 0,
+  },
+  deleteTip: {
+    marginLeft: 4,
+    fontFamily: "OpenSansBold",
+    fontSize: 13,
+    width: "80%",
+    borderWidth: 1,
+    borderColor: "red",
+    borderRadius: 10,
+  },
   accountInfoContainer: {
     position: "absolute",
-    top: 300,
+    top: 350,
     width: "80%",
     left: 10,
   },
@@ -167,8 +212,8 @@ const styles = StyleSheet.create({
   },
   deleteResponsesContainer: {
     position: "absolute",
-    top: 450,
-    width: "80%",
+    top: 500,
+    width: "100%",
     left: 10,
   },
   deleteResponsesText: {

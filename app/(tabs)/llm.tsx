@@ -10,6 +10,7 @@ const App = () => {
   const [question, setQuestion] = useState<string>("")
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [response, setResponse] = useState<string>("Waiting for question...")
+  const [showServerError, setShowServerError] = useState<boolean>(false)
 
   useFonts({
     "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
@@ -21,9 +22,7 @@ const App = () => {
   })
 
   const sendQuestion = async () => {
-    console.log(question)
     if (question === "") {
-      console.log("huh")
       return setResponse("Ask a question")
     }
     const token = await SecureStore.getItemAsync("jwt")
@@ -35,11 +34,12 @@ const App = () => {
       setQuestion("")
       Keyboard.dismiss
       const response = await axios.post("http://192.168.1.100:8001/api/openAI", sentData)
+      setShowServerError(false)
       setResponse(response.data)
     } catch (err) {
       const axiosError = err as AxiosError
       if (axiosError.response && axiosError.response.status === 400) {
-        // NOTE: add the server error pop up
+        setShowServerError(true)
       }
     }
   }
@@ -69,6 +69,12 @@ const App = () => {
           <Text style={{fontFamily: "OpenSansBold", fontSize: 15, color: "white"}}> {response} </Text>
         </View>
       </ScrollView>
+      {showServerError && (
+        <View style={styles.serverError}>
+          <FontAwesome style={styles.serverVector} name="server" size={24} color="black" />
+          <Text> An error has occured </Text>
+        </View>
+      )}
     </SafeAreaView>
   )
 }
@@ -88,6 +94,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     position: "relative",
     width: "90%",
+  },
+  serverError: {
+    position: "absolute",
+    width: "60%",
+    height: 225,
+    backgroundColor: "red",
+    top: 200,
+    borderRadius: 10,
+  },
+  serverVector: {
+    position: "absolute",
+    alignSelf: "center",
+    top: 60,
   },
   askBox: {
     flex: 1,

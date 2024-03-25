@@ -40,6 +40,12 @@ const UserForm = () => {
       hasErrors = true
     }
 
+    if (!validatePassword(password)) {
+      setPasswordError("Password should have a number, should have a length of minimum 8, a special character and an uppercase and lowercase character.")
+      hasErrors = true
+    }
+
+
     if (hasErrors) {
       return
     }
@@ -87,13 +93,17 @@ const UserForm = () => {
     return validator.isEmail(email)
   }
 
-  // TODO: styling for age range
+  const validatePassword = (password: string): boolean => {
+    return validator.isStrongPassword(password)
+  }
+
   return(
   <SafeAreaView style={styles.root}>
       <View style={styles.inputContainer}>
         <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
             <Entypo name="circle-with-cross" size={35} color="#FF954F" />
         </Pressable>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 30, color:"#FF954F"}}> Register </Text>
         <Text style={styles.errors}> {emailError} </Text>
         <TextInput
           style={styles.input}

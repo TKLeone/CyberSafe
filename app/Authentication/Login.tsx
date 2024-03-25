@@ -77,6 +77,7 @@ const UserForm = () => {
         <Pressable style={styles.quitButton} onPress={() => router.navigate("/")}>
           <Entypo name="circle-with-cross" size={35} color="#FF954F" />
         </Pressable>
+        <Text style={{fontFamily: "OpenSansBold", fontSize: 30, color:"#FF954F"}}> Login </Text>
         <Text style={styles.errors}> {emailError} </Text>
         <TextInput style={styles.input}
           onChangeText={handleEmailChange}

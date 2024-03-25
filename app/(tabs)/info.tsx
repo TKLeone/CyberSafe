@@ -223,6 +223,8 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
     borderRadius: 10,
+    borderColor: "#FF954F",
+    borderWidth: 1,
   },
   infoTextContainer: {
     borderRadius: 7,

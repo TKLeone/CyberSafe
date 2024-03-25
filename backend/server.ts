@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import express, {Request, Response} from "express"
 import mongoose, {Document, Schema, Model, CallbackError} from "mongoose"
 import jwt, { JwtPayload } from "jsonwebtoken"
@@ -10,6 +11,7 @@ import { topicValidation} from "./topicValidation"
 import OpenAI from "openai"
 
 dotenv.config()
+dotenv.config({path: "../.env"})
 const app = express()
 const port = 8001
 
@@ -29,13 +31,12 @@ const userSchema = new Schema<IUsers>({
 })
 
 userSchema.pre<IUsers>("save", async function (next) {
-    const user: IUsers = this
-    if (!user.isModified("password")) return next()
+    if (!this.isModified("password")) return next()
 
     const saltRounds: number = 10
     try {
-        const hash = await bcrypt.hash(user.password, saltRounds)
-        user.password = hash
+        const hash = await bcrypt.hash(this.password, saltRounds)
+        this.password = hash
         next()
     } catch (err) {
         if (err instanceof Error) {
@@ -44,6 +45,10 @@ userSchema.pre<IUsers>("save", async function (next) {
         return next(new Error("An unknown error occured"))
     }
 })
+
+userSchema.methods.comparePassword = async function (newPassword: string) {
+return bcrypt.compare(newPassword, this.password)
+}
 
 const User: Model<IUsers> = userConn.model("users", userSchema)
 
@@ -54,7 +59,6 @@ app.post("/users", async (req: Request, res: Response) => {
     try {
         let {password, email, ageRange} = req.body
         email = email.toLowerCase()
-
         const existingUser =  await User.findOne({email})
         if (existingUser) {
             return res.status(400).json({email: "Email already exists"})
@@ -64,7 +68,6 @@ app.post("/users", async (req: Request, res: Response) => {
         await newUser.save()
         res.status(200).json({message: "Registered Account"})
     } catch (err) {
-        console.error(err)
         res.status(500).json({ error: "Internal Server Error" })
     }
 })
@@ -74,7 +77,6 @@ app.post("/login", async (req: Request, res: Response) => {
     email = email.toLowerCase()
 
     const user = await User.findOne({email:email})
-
     if (!user) {
         res.status(401).json({error: "Email can't be found"})
     } else {
@@ -98,10 +100,6 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 })
 
-userSchema.methods.comparePassword = async function (newPassword: string) {
-    return bcrypt.compare(newPassword, this.password)
-}
-
 app.post("/validateJWT", cookieJWTAuth, (req: IGetAuthenticatedRequest, res: Response) => {
     res.status(200).json({message: "Successful Validation"})
 })
@@ -115,7 +113,7 @@ app.post("/getAccountInfo", cookieJWTAuth, async (req: IGetAuthenticatedRequest,
                 res.json(data)
             } else {
                 res.status(401).json({error: "Can't get user from database"})
-            } 
+            }
         } else {
             res.status(401).json({error: "User can't be foundd"})
         }
@@ -142,7 +140,7 @@ app.post("/deleteaccount", cookieJWTAuth, async (req: IGetAuthenticatedRequest, 
             }
         }
     } catch (err) {
-        res.status(500).json({erro: "Internal Server Error"})
+        res.status(500).json({error: "Internal Server Error"})
     }
 })
 
@@ -163,7 +161,6 @@ const Topic: Model<ITopics> = userConn.model("topics", topicSchema)
 
 app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
     let {label} = req.body
-
     label = topicValidation(label)
     const topicData = await Topic.findOne({[label]: {$exists: true}})
     if (topicData) {
@@ -175,7 +172,7 @@ app.post("/getTopicData", cookieJWTAuth, async (req: IGetAuthenticatedRequest, r
     }
 })
 
-const openai = new OpenAI()
+const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY})
 
 interface IResponse extends Document{
     userId: Schema.Types.ObjectId
@@ -187,12 +184,10 @@ const responseSchema = new Schema<IResponse>({
     info: {type: String, required: true}
 })
 
-
 const userResponse: Model<IResponse> = userConn.model("responses", responseSchema)
 
-
 app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res: Response) => {
-    const test = req.body
+    const question = req.body
     let ageRange
     let doc
     try {
@@ -212,31 +207,34 @@ app.post("/api/openAI", cookieJWTAuth, async (req: IGetAuthenticatedRequest, res
         default: message = "You are an expert cybersecurity specialist. Your information should come from the National Cyber Security Centre by the United Kingdom and the Cybersecurity and Infrastructure Security Agency by the United States of America. You will only provide responses that relate to cybersecurity. Use real world examples catered for teenagers for the response you give. "; break
     }
     try {
-        // TODO: use the moderations api to check if message is bad
-        // NOTE: if it's bad then don't add to db and don't use completions api, if it's good then add to db 
-        const completion = await openai.chat.completions.create({
-            messages:[
-                {"role": "system", "content": message},
-                {"role": "user", "content": test.question},
-            ],
-            model: "gpt-3.5-turbo",
-        })
-        const response = completion.choices[0].message.content
-        const userId = doc?.get("_id")
-        const getResponse = await userResponse.findOne({userId: userId})
-
-        if (!getResponse) {
-            const newResponse = new userResponse({userId, info: response})
-            newResponse.save()
+        const moderation = await openai.moderations.create({input: question.question})
+        if (moderation.results[0].flagged === true) {
+            res.send("Your question has been flagged under moderations. Ask a cyber security question instead.")
         } else {
-            let getInfo = getResponse?.get("info")
-            if (getInfo) {
-                getInfo += `\n\n\n${response}`
-                getResponse.set("info", getInfo)
-                await getResponse.save()
+            const completion = await openai.chat.completions.create({
+                messages:[
+                    {"role": "system", "content": message},
+                    {"role": "user", "content": question.question},
+                ],
+                model: "gpt-3.5-turbo",
+            })
+            const response = completion.choices[0].message.content
+            const userId = doc?.get("_id")
+            const getResponse = await userResponse.findOne({userId: userId})
+
+            if (!getResponse) {
+                const newResponse = new userResponse({userId, info: response})
+                newResponse.save()
+            } else {
+                let getInfo = getResponse?.get("info")
+                if (getInfo) {
+                    getInfo += `\n\n\n${response}`
+                    getResponse.set("info", getInfo)
+                    await getResponse.save()
+                }
             }
+            res.status(200).send(response)
         }
-        res.send(response)
     } catch (err) {
         res.status(400).json({error: "Can't connect to openAI api"})
     }
@@ -250,7 +248,7 @@ app.post("/getResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest, re
             const userId = data?.get("_id")
             const getResponse = await userResponse.findOne({userId: userId})
             const info = getResponse?.get("info")
-            res.json({info})
+            res.status(200).json({info})
         } else {
             res.status(500).json({error: "can't find user"})
         }
@@ -291,3 +289,5 @@ app.post("/deleteResponse", cookieJWTAuth, async (req: IGetAuthenticatedRequest,
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
 })
+
+export default app

@@ -4,9 +4,11 @@ import axios, { AxiosError } from "axios"
 import validateJWT from "../Authentication/validateJWT"
 import * as SecureStore from "expo-secure-store"
 import { useFonts} from "expo-font"
+import { FontAwesome } from "@expo/vector-icons"
 
 const App = () => {
   const [segmentedResponseData, setSegmentedResponseData] = useState<string[]>([""])
+  const [showServerError, setShowServerError] = useState<boolean>(false)
 
   useFonts({
     "OpenSansBold": require("../assets/fonts/OpenSans-Bold.ttf"),
@@ -19,16 +21,17 @@ const App = () => {
       const response = await axios.post("http://192.168.1.100:8001/getResponse", {token})
       const segmentedResponseData: string[] = response.data.info.split("\n\n\n")
 
+      setShowServerError(false)
       setSegmentedResponseData(segmentedResponseData)
 
     } catch (err) {
       const axiosError = err as AxiosError
       if(axiosError.response && axiosError.response.status === 500) {
+        setShowServerError(true)
       }
     }
   }
 
-  // TODO: figure out a way to auto update once response is created
   useEffect(() => {
     validateJWT(false)
     fetchData()
@@ -50,6 +53,12 @@ const App = () => {
             <Text style={styles.noData}> No data Available </Text>
           )}
         </View>
+      {showServerError && (
+        <View style={styles.serverError}>
+          <FontAwesome style={styles.serverVector} name="server" size={24} color="black" />
+          <Text> An error has occured </Text>
+        </View>
+      )}
     </SafeAreaView>
   )
 }
@@ -59,6 +68,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#181b20",
     fontSize: 30,
+  },
+  serverError: {
+    position: "absolute",
+    width: "60%",
+    height: 225,
+    backgroundColor: "red",
+    top: 200,
+    borderRadius: 10,
+  },
+  serverVector: {
+    position: "absolute",
+    alignSelf: "center",
+    top: 60,
   },
   scrollView: {
     flex: 1,

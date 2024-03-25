@@ -1,20 +1,31 @@
 import {Image, Text, SafeAreaView, StyleSheet, Pressable} from "react-native"
 import {router} from "expo-router"
 import validateJWT from "./Authentication/validateJWT"
-import React, {useEffect} from "react"
+import React, {useCallback, useEffect} from "react"
 import { useFonts} from "expo-font"
+import * as SplashScreen from "expo-splash-screen"
 
+SplashScreen.preventAutoHideAsync()
 
-// TODO: fix opensans font warning 
 const HomePage = () => {
   useEffect(() => {
     validateJWT(true)
   }, [])
 
-  useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     "OpenSansBold": require("./assets/fonts/OpenSans-Bold.ttf"),
     "OpenSansRegular": require("./assets/fonts/OpenSans-Regular.ttf"),
   })
+  
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync()
+    }
+  }, [fontsLoaded, fontError])
+
+  if (!fontsLoaded && !fontError) {
+    return null
+  }
 
   const goToLogin = () =>{
     router.navigate("/Authentication/Login")
@@ -25,7 +36,7 @@ const HomePage = () => {
   }
 
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView style={styles.root} onLayout={onLayoutRootView}>
       <Image 
         style={styles.image}
         source={require("./assets/CyberSafe.png")}

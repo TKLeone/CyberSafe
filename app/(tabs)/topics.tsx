@@ -19,7 +19,7 @@ interface userData {
 // TODO: add more topics and info
 const buttons: buttonData[] = [
   {importance: 1, label: "PHISHING"},
-  {importance: 2, label: "REPLACE VALUE"},
+  {importance: 2, label: "ONLINE GAMING"},
   {importance: 3, label: "CYBER BULLYING"},
   {importance: 4, label: "ONLINE PREDATORS"},
   {importance: 5, label: "PEER PRESSURE"},
@@ -63,7 +63,6 @@ const App = () => {
       const response = await axios.post("http://192.168.1.100:8001/ageRange", {token},{withCredentials: true})
       const {ageRange} = response.data as userData
       setShowServerError(false)
-      console.log("server error")
       return {ageRange}
     } catch (err) {
       const axiosError = err as AxiosError
@@ -75,7 +74,6 @@ const App = () => {
 
   useEffect(() => {
     validateJWT(false)
-    console.log("why isn't this triggering")
     fetchData().then((data) => {
       if (data) {
         setAgeRange(data.ageRange)
@@ -124,7 +122,17 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   serverError: {
-    alignSelf: "center"
+    position: "absolute",
+    width: "60%",
+    height: 225,
+    backgroundColor: "red",
+    top: 200,
+    borderRadius: 10,
+  },
+  serverVector: {
+    position: "absolute",
+    alignSelf: "center",
+    top: 60,
   },
   header: {
     alignSelf: "center",
