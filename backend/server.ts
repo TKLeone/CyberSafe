@@ -15,7 +15,6 @@ dotenv.config({path: "../.env"})
 const app = express()
 const port = 8001
 
-// NOTE: see if devweb hosting works
 const userConn = mongoose.createConnection("mongodb://127.0.0.1:27017/users")
 
 interface IUsers extends Document {
@@ -89,7 +88,7 @@ app.post("/login", async (req: Request, res: Response) => {
         const secretKey: string = process.env.SECRET_KEY as string
         try {
             if(secretKey){
-                const token = jwt.sign({user}, secretKey, { expiresIn: "5m" })
+                const token = jwt.sign({user}, secretKey, { expiresIn: "1d" })
 
                 return res.send(token).status(200)
             } else {

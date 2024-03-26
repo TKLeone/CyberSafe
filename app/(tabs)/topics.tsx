@@ -1,6 +1,6 @@
 import {router} from "expo-router"
 import React, { useEffect, useState } from "react"
-import {Text, SafeAreaView, Pressable, StyleSheet, View } from "react-native"
+import {Text, SafeAreaView, Pressable, StyleSheet, View, ScrollView } from "react-native"
 import validateJWT from "../Authentication/validateJWT"
 import axios, { AxiosError } from "axios"
 import { FontAwesome } from "@expo/vector-icons"
@@ -16,7 +16,6 @@ interface userData {
   ageRange: string,
 }
 
-// TODO: add more topics and info
 const buttons: buttonData[] = [
   {importance: 1, label: "PHISHING"},
   {importance: 2, label: "ONLINE GAMING"},
@@ -34,10 +33,9 @@ const updateButtonImportance =  (buttons: buttonData[], ageRangeData: string) =>
   const ageRange = ageRangeData
 
   const importanceMap: Record<string, number[]> = {
-    // TODO: change topic importance to correct age ranges
-    "13-14":[4,5,3,1,2,6,7,8,9,10],
-    "15-16":[1,10,5,4,3,6,7,8,9,2],
-    "17-19":[7,2,3,10,5,6,1,8,9,4],
+    "13-14":[3,6,1,5,4,2,7,8,9,10],
+    "15-16":[3,6,2,1,5,4,7,8,9,10],
+    "17-19":[9,5,10,1,2,6,7,8,3,4],
   }
 
   const customImportance = importanceMap[ageRange]
@@ -103,13 +101,13 @@ const App = () => {
       <View style={styles.header}>
         <Text style={styles.headerText}> Security Topics </Text>
       </View>
-      <View style={styles.buttonContainer}>
+      <ScrollView contentContainerStyle={styles.buttonContainer}>
         {sortedButtons.map((button) => (
           <Pressable key={button.importance} onPress={() => handleClick(button.label)} style={styles.button}>
             <Text style={styles.labelText}>{button.label}</Text>
           </Pressable>
         ))}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }

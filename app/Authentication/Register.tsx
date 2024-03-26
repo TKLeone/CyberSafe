@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   quitButton: {
     position: "absolute",
     zIndex: 1,
-    top: -170,
+    top: -120,
     left: 0,
   },
   exitIcon: {

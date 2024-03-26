@@ -8,6 +8,10 @@ backend/.env
 # dependencies
 node_modules/
 
+#test
+test/
+coverage/
+
 # Expo
 .expo/
 # dist/
