@@ -18,6 +18,8 @@ export const topicValidation = (label: string) => {
             return "cyber_bullying"
         case "ONLINE DATING":
             return "online_dating"
+        case "ONLINE GAMING":
+            return "online_gaming"
         default:
             return label
     }
